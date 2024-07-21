@@ -1,6 +1,9 @@
 ---
 # defaults file for mkinitcpio
 
+# mkinitcpio: wether initramfs should be build or not.
+mkinitcpio_build_initramfs: true
+
 # mkinitcpio: additional binaries for the initramfs image.
 mkinitcpio_conf_binaries: []
 

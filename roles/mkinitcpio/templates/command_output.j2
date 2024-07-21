@@ -1,0 +1,15 @@
+{% if command.stdout_lines | length > 0 %}
+STDOUT:
+
+{% for line in command.stdout_lines %}
+{{ line }}
+{% endfor %}
+{% endif %}
+
+{% if command.stderr_lines | length > 0 %}
+STDERR:
+
+{% for line in command.stderr_lines %}
+{{ line }}
+{% endfor %}
+{% endif %}

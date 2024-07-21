@@ -48,6 +48,58 @@
     owner: root
     group: root
     mode: "0644"
+    backup: true
+  become: true
   diff: true
+  register: template_mkinitcpio
+
+- name: Write backup file to variable
+  ansible.builtin.set_fact:
+    mkinitcpio_conf_backup_file: "{{ template_mkinitcpio.backup_file }}"
+  when: template_mkinitcpio.backup_file is defined
+
+- name: Build initramfs
+  when:
+    - mkinitcpio_build_initramfs
+    - template_mkinitcpio.changed
+
+  block:
+    - name: Include tasks build_initramfs
+      ansible.builtin.include_tasks:
+        file: build_initramfs.yaml
+
+  rescue:
+    - name: Restore old mkinitcpio.conf file
+      ansible.builtin.copy:
+        remote_src: true
+        src: "{{ mkinitcpio_conf_backup_file }}"
+        dest: "{{ mkinitcpio_conf_path }}"
+        owner: root
+        group: root
+        mode: "0644"
+      become: true
+
+    - name: Include tasks build_initramfs for old configuration.
+      ansible.builtin.include_tasks:
+        file: build_initramfs.yaml
+
+  always:
+    - name: Nullify command_mkinitcpio variable
+      ansible.builtin.set_fact:
+        command_mkinitcpio: null
+
+- name: Delete backup file if exists
+  ansible.builtin.file:
+    path: "{{ mkinitcpio_conf_backup_file }}"
+    state: absent
+  become: true
+  diff: true
+  when:
+    - mkinitcpio_conf_backup_file is defined
+
+- name: Nullify runtime variables
+  ansible.builtin.set_fact:
+    template_mkinitcpio: null
+    mkinitcpio_conf_backup_file: null
 
 # End of file
