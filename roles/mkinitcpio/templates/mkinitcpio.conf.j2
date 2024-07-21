@@ -1,0 +1,39 @@
+# ##############################################################################
+#
+# {{ ansible_managed }}
+#
+# /etc/mkinitcpio.conf
+#
+# See following resources for more information:
+#
+#   - mkinitcpio(8)
+#   - mkinitcpio.conf(5)
+#   - https://wiki.archlinux.org/title/Mkinitcpio
+#
+# ##############################################################################
+
+MODULES=({{ mkinitcpio_conf_modules | join(' ') }})
+
+BINARIES=({{ mkinitcpio_conf_binaries | join(' ') }})
+
+FILES=({{ mkinitcpio_conf_files | join(' ') }})
+
+HOOKS=({{ mkinitcpio_conf_hooks | join(' ') }})
+
+{% if (mkinitcpio_conf_compression is defined) and (mkinitcpio_conf_compression is not none) %}
+COMPRESSION="{{ mkinitcpio_conf_compression }}"
+{% else %}
+#COMPRESSION=""
+{% endif %}
+
+{% if (mkinitcpio_conf_compression_options  is defined) and (mkinitcpio_conf_compression_options  is not none) %}
+COMPRESSION_OPTIONS=({{ mkinitcpio_conf_compression_options  }})
+{% else %}
+#COMPRESSION_OPTIONS=()
+{% endif %}
+
+{% if (mkinitcpio_conf_modules_decompress is defined) and (mkinitcpio_conf_modules_decompress is not none) %}
+MODULES_DECOMPRESS="{{ mkinitcpio_conf_modules_decompress }}"
+{% else %}
+#MODULES_DECOMPRESS=""
+{% endif %}

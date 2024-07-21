@@ -1,0 +1,32 @@
+---
+# defaults file for mkinitcpio
+
+# mkinitcpio: additional binaries for the initramfs image.
+mkinitcpio_conf_binaries: []
+
+# mkinitcpio: additional files for the initramfs image.
+mkinitcpio_conf_files: []
+
+# mkinitcpio: array of hooks for the build process.
+mkinitcpio_conf_hooks:
+  # default hooks from mkinitcpio package on Arch Linux (as of may 2024).
+  - base
+  - udev
+  - autodetect
+  - microcode
+  - modconf
+  - kms
+  - keyboard
+  - keymap
+  - consolefont
+  - block
+  - filesystems
+  - fsck
+
+# mkinitcpio: additional modules for the initramfs image.
+mkinitcpio_conf_modules: []
+
+# mkinitcpio: path of the mkinitcpio config file
+mkinitcpio_conf_path: "/etc/mkinitcpio.conf"
+
+# End of file

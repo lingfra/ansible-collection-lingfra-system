@@ -1,0 +1,14 @@
+---
+# meta file for mkinitcpio
+
+dependencies: []
+
+galaxy_info:
+  author: lingling
+  description: Installs and configures mkinitcpio and optionally setup mkinitcpio-systemd-tool for remote root device decryption over SSH.
+  license: The Unlicense
+  min_ansible_version: "2.15"
+
+  platforms: []
+
+# End of file

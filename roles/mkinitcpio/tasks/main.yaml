@@ -1,0 +1,53 @@
+---
+# tasks file for mkinitcpio
+
+- name: Check public role variables
+  ansible.builtin.assert:
+    that:
+      # mkinitcpio_conf_binaries is a list
+      - mkinitcpio_conf_binaries is defined
+      - mkinitcpio_conf_binaries is not none
+      - mkinitcpio_conf_binaries is not string
+      - mkinitcpio_conf_binaries is not mapping
+      - mkinitcpio_conf_binaries is iterable
+
+      # mkinitcpio_conf_files is a list
+      - mkinitcpio_conf_files is defined
+      - mkinitcpio_conf_files is not none
+      - mkinitcpio_conf_files is not string
+      - mkinitcpio_conf_files is not mapping
+      - mkinitcpio_conf_files is iterable
+
+      # mkinitcpio_conf_hooks is a list
+      - mkinitcpio_conf_hooks is defined
+      - mkinitcpio_conf_hooks is not none
+      - mkinitcpio_conf_hooks is not string
+      - mkinitcpio_conf_hooks is not mapping
+      - mkinitcpio_conf_hooks is iterable
+
+      # mkinitcpio_conf_modules is a list
+      - mkinitcpio_conf_modules is defined
+      - mkinitcpio_conf_modules is not none
+      - mkinitcpio_conf_modules is not string
+      - mkinitcpio_conf_modules is not mapping
+      - mkinitcpio_conf_modules is iterable
+
+      # mkinitcpio_conf_path is a string
+      - mkinitcpio_conf_path is defined
+      - mkinitcpio_conf_path is not none
+      - mkinitcpio_conf_path is string
+      - mkinitcpio_conf_path | length > 0
+    fail_msg: Bad syntax for public role variables.
+    success_msg: All assertions passed.
+    quiet: true
+
+- name: Template mkinitcpio.conf
+  ansible.builtin.template:
+    src: mkinitcpio.conf.j2
+    dest: "{{ mkinitcpio_conf_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  diff: true
+
+# End of file
