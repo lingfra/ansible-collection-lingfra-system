@@ -1,4 +1,13 @@
 ---
 # vars file for mkinitcpio
 
+mkinitcpio_systemd_tool_packages:
+  - mkinitcpio-systemd-tool
+  - busybox
+  - cryptsetup
+  - openssh
+  - tinyssh
+  - tinyssh-convert
+  - mc
+
 # End of file

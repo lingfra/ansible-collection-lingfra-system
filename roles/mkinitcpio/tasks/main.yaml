@@ -41,6 +41,25 @@
     success_msg: All assertions passed.
     quiet: true
 
+- name: Set internal fact mkinitcpio_internal_ssh_pub_key
+  ansible.builtin.set_fact:
+    mkinitcpio_internal_ssh_pub_key: "{{ lookup('env', 'HOME') }}/.ssh/{{ mkinitcpio_systemd_tool_ssh_pub_key }}"
+  when:
+    - mkinitcpio_systemd_tool_setup
+
+- name: Include sytemd-tool checks
+  ansible.builtin.include_tasks:
+    file: systemd-tool-checks.yaml
+  when:
+    - mkinitcpio_systemd_tool_setup
+
+- name: Include sytemd-tool tasks
+  ansible.builtin.include_tasks:
+    file: systemd-tool.yaml
+  when:
+    - mkinitcpio_systemd_tool_setup
+  register: setup_systemd_tool
+
 - name: Template mkinitcpio.conf
   ansible.builtin.template:
     src: mkinitcpio.conf.j2
@@ -62,6 +81,7 @@
   when:
     - mkinitcpio_build_initramfs
     - template_mkinitcpio.changed
+    # ToDo: Build initramfs also when there are changed for systemd-tool.
 
   block:
     - name: Include tasks build_initramfs
@@ -101,5 +121,6 @@
   ansible.builtin.set_fact:
     template_mkinitcpio: null
     mkinitcpio_conf_backup_file: null
+    mkinitcpio_internal_ssh_pub_key: null
 
 # End of file

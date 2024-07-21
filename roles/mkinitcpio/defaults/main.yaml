@@ -32,4 +32,37 @@ mkinitcpio_conf_modules: []
 # mkinitcpio: path of the mkinitcpio config file
 mkinitcpio_conf_path: "/etc/mkinitcpio.conf"
 
+# mkinitcpio: crypttab entry. See crypttab(5).
+mkinitcpio_systemd_tool_crypttab_entry:
+  # <name> name of the mapped device.
+  - root
+  # <device> need to be a UUID.
+  - UUID="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+  # <password> should be none to trigger password prompt.
+  - none
+  # <options>
+  - luks
+
+# mkinitcpio: fstab entry for the sysroot device. See fstab(5).
+mkinitcpio_systemd_tool_fstab_entry:
+  # <device> need to be the mapped device from crypttab.
+  - "/dev/mapper/root"
+  # <dir> need to be /sysroot.
+  - "/sysroot"
+  # <type>
+  - "auto"
+  # <options>
+  - "x-systemd.device-timeout=9999h"
+  # <dump>
+  - 0
+  # <fsck>
+  - 0
+
+# mkinitcpio: SSH public key for early userspace unlocking access. Need to
+# exist under ~/.ssh/ on the control host and need to be type ed25519.
+mkinitcpio_systemd_tool_ssh_pub_key: id_ed25519
+
+# mkinitcpio: wether systemd-tool should be installed and configured or not.
+mkinitcpio_systemd_tool_setup: false
+
 # End of file
