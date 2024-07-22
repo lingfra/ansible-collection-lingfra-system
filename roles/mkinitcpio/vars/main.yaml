@@ -1,6 +1,7 @@
 ---
 # vars file for mkinitcpio
 
+# mkinitcpio: List of dependencies needed for systemd-tool to work.
 mkinitcpio_systemd_tool_packages:
   - mkinitcpio-systemd-tool
   - busybox

@@ -9,6 +9,8 @@ functions.
 
 - [apt_source](./roles/apt_source/README.md): Configure APT sources on Deb-based
 systems.
+- [mkinitcpio](./roles/mkinitcpio/README.md): Configures mkinitcpio and builds
+the initramfs.
 - [pacman](./roles/pacman/README.md): Configures the Pacman package manager and
 its mirrors.
 - [pkgs](./roles/pkgs/README.md): Install and remove system packages.
