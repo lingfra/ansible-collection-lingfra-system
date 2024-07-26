@@ -4,6 +4,11 @@
 - name: Check public role variables
   ansible.builtin.assert:
     that:
+      # mkinitcpio_build_initramfs is a boolean
+      - mkinitcpio_build_initramfs is defined
+      - mkinitcpio_build_initramfs is not none
+      - mkinitcpio_build_initramfs is boolean
+
       # mkinitcpio_conf_binaries is a list
       - mkinitcpio_conf_binaries is defined
       - mkinitcpio_conf_binaries is not none
@@ -32,11 +37,54 @@
       - mkinitcpio_conf_modules is not mapping
       - mkinitcpio_conf_modules is iterable
 
+      # mkinitcpio_conf_compression is a string
+      - (mkinitcpio_conf_compression is not defined) or (mkinitcpio_conf_compression is not none)
+      - (mkinitcpio_conf_compression is not defined) or (mkinitcpio_conf_compression is string)
+      - (mkinitcpio_conf_compression is not defined) or (mkinitcpio_conf_compression | length > 0)
+
+      # mkinitcpio_conf_compression_options  is a string
+      - (mkinitcpio_conf_compression_options  is not defined) or (mkinitcpio_conf_compression_options  is not none)
+      - (mkinitcpio_conf_compression_options  is not defined) or (mkinitcpio_conf_compression_options  is string)
+      - (mkinitcpio_conf_compression_options  is not defined) or (mkinitcpio_conf_compression_options  | length > 0)
+
+      # mkinitcpio_conf_modules_decompress is a string
+      - (mkinitcpio_conf_modules_decompress is not defined) or (mkinitcpio_conf_modules_decompress is not none)
+      - (mkinitcpio_conf_modules_decompress is not defined) or (mkinitcpio_conf_modules_decompress is string)
+      - (mkinitcpio_conf_modules_decompress is not defined) or (mkinitcpio_conf_modules_decompress | length > 0)
+
       # mkinitcpio_conf_path is a string
       - mkinitcpio_conf_path is defined
       - mkinitcpio_conf_path is not none
       - mkinitcpio_conf_path is string
       - mkinitcpio_conf_path | length > 0
+
+      # mkinitcpio_systemd_tool_setup is a boolean
+      - mkinitcpio_systemd_tool_setup is defined
+      - mkinitcpio_systemd_tool_setup is not none
+      - mkinitcpio_systemd_tool_setup is boolean
+
+      # mkinitcpio_systemd_tool_crypttab_entry is a list
+      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_crypttab_entry is defined)
+      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_crypttab_entry is not none)
+      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_crypttab_entry is not string)
+      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_crypttab_entry is not mapping)
+      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_crypttab_entry is iterable)
+      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_crypttab_entry | length >= 2)
+      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_crypttab_entry | length <= 4)
+
+      # mkinitcpio_systemd_tool_fstab_entry is a list
+      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_fstab_entry is defined)
+      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_fstab_entry is not none)
+      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_fstab_entry is not string)
+      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_fstab_entry is not mapping)
+      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_fstab_entry is iterable)
+      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_fstab_entry | length == 6)
+
+      # mkinitcpio_systemd_tool_ssh_pub_key is a string
+      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_ssh_pub_key is defined)
+      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_ssh_pub_key is not none)
+      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_ssh_pub_key is string)
+      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_ssh_pub_key | length > 0)
     fail_msg: Bad syntax for public role variables.
     success_msg: All assertions passed.
     quiet: true
