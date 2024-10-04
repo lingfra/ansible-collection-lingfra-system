@@ -1,0 +1,44 @@
+---
+# tasks file for sd_network
+
+- name: Template 20-dev-vlan.netdev
+  ansible.builtin.template:
+    src: vlan-netdev.j2
+    dest: "{{ file_dest_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  vars:
+    file_dest_path: /etc/systemd/network/20-{{ vlan.dev_vlan }}.netdev
+
+- name: Template 30-dev-br.netdev
+  ansible.builtin.template:
+    src: br-netdev.j2
+    dest: "{{ file_dest_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  vars:
+    file_dest_path: /etc/systemd/network/30-{{ vlan.dev_br }}.netdev
+
+- name: Template 40-dev-vlan.network
+  ansible.builtin.template:
+    src: vlan-network.j2
+    dest: "{{ file_dest_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  vars:
+    file_dest_path: /etc/systemd/network/40-{{ vlan.dev_vlan }}.network
+
+- name: Template 50-dev-br.network
+  ansible.builtin.template:
+    src: br-network.j2
+    dest: "{{ file_dest_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  vars:
+    file_dest_path: /etc/systemd/network/50-{{ vlan.dev_br }}.network
+
+# End of file

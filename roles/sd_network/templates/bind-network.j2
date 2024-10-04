@@ -1,0 +1,11 @@
+# {{ file_dest_path | default('N/A') }}
+
+[Match]
+Name={{ net.dev }}
+
+[Network]
+{% for vlan in vlan_list %}
+VLAN={{ vlan.dev_vlan }}
+{% endfor %}
+
+# End of file

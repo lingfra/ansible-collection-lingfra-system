@@ -1,0 +1,46 @@
+---
+# tasks file for sd_network
+
+- name: Set example input
+  ansible.builtin.set_fact:
+    net:
+      dev: enp2s0
+      vlans:
+        - 10
+        - 11
+        - 12
+        - 13
+
+- name: Set fact dev_vlan_list
+  ansible.builtin.set_fact:
+    vlan_list: "{{ vlan_list | default([])
+      + [{
+          'dev_vlan': net.dev ~ 'vlan' ~ vlan,
+          'dev_br': net.dev ~ 'br' ~ vlan,
+          'id': vlan
+        }]
+      }}"
+  loop: "{{ net.vlans }}"
+  loop_control:
+    loop_var: vlan
+
+- name: Template 10-bind.network
+  ansible.builtin.template:
+    src: bind-network.j2
+    dest: "{{ file_dest_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  vars:
+    file_dest_path: /etc/systemd/network/10-bind-{{ net.dev }}.network
+
+- name: "Include tasks vlan.yaml"
+  ansible.builtin.include_tasks:
+    file: vlan.yaml
+  loop: "{{ vlan_list }}"
+  loop_control:
+    loop_var: vlan
+    label: "{{ vlan.id | default('N/A') }}"
+
+
+# End of file

@@ -1,0 +1,14 @@
+---
+# meta file for sd_network
+
+dependencies: []
+
+galaxy_info:
+  author: lingling
+  description: Configure systemd-network to create VLANs and bridge devives.
+  license: The Unlicense
+  min_ansible_version: "2.15"
+
+  platforms: []
+
+# End of file
