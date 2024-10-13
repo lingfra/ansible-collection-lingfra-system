@@ -27,6 +27,11 @@ argument_specs:
           - "Every list item consists of a device name and a list of VLANs, which should be interpreted from this device."
           - "When this list is empty (the default) no actions are done."
         options:
+          config_dir:
+            type: "str"
+            default: "/etc/systemd/network"
+            description:
+              - "Specifies the configuration parent directory for the network configuration files."
           device:
             type: "str"
             required: true

@@ -13,9 +13,13 @@
 #   - device_bind_network_file (str): Path of the file binding the device to
 #     the VLAN IDs.
 
+- name: "Initialize device_vlan_list_accumulated as empty list"
+  ansible.builtin.set_fact:
+    device_vlan_list_accumulated: []
+
 - name: "Set fact device_vlan_list_accumulated"
   ansible.builtin.set_fact:
-    device_vlan_list_accumulated: "{{ device_vlan_list_accumulated | default([])
+    device_vlan_list_accumulated: "{{ device_vlan_list_accumulated
       + [{
           'create_bridge': vlan.create_bridge | default(sd_network_create_bridge_default),
           'device_bridge': device_bridge,
@@ -23,10 +27,10 @@
           'dhcp': vlan.dhcp | default(sd_network_dhcp_default),
           'id': vlan.id,
           'files': {
-            'bridge_netdev': (sd_network_systemd_network_dir, '30-' ~ device_bridge ~ '.netdev') | path_join,
-            'bridge_network': (sd_network_systemd_network_dir, '50-' ~ device_bridge ~ '.network') | path_join,
-            'vlan_netdev': (sd_network_systemd_network_dir, '20-' ~ device_vlan ~ '.netdev') | path_join,
-            'vlan_network': (sd_network_systemd_network_dir, '40-' ~ device_vlan ~ '.network') | path_join,
+            'bridge_netdev': (config_dir, '30-' ~ device_bridge ~ '.netdev') | path_join,
+            'bridge_network': (config_dir, '50-' ~ device_bridge ~ '.network') | path_join,
+            'vlan_netdev': (config_dir, '20-' ~ device_vlan ~ '.netdev') | path_join,
+            'vlan_network': (config_dir, '40-' ~ device_vlan ~ '.network') | path_join,
           }
         }]
       }}"
@@ -34,8 +38,9 @@
   loop_control:
     loop_var: vlan
   vars:
-    device_bridge: "{{ device.device ~ 'br' ~ vlan.id }}"
-    device_vlan: "{{ device.device ~ 'vlan' ~ vlan.id }}"
+    device_bridge: "{{ 'br' ~ vlan.id }}"
+    device_vlan: "{{ device.device ~ '.' ~ vlan.id }}"
+    config_dir: "{{ device.config_dir | default(sd_network_systemd_network_dir) }}"
 
 - name: "Template {{ device_bind_network_file }}"
   ansible.builtin.template:

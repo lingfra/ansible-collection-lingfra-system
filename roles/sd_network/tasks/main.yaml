@@ -9,6 +9,6 @@
     loop_var: device
     label: "{{ device.device | default('N/A') }}"
   vars:
-    device_bind_network_file: "{{ (sd_network_systemd_network_dir, '10-bind-' ~ device.device ~'.network') | path_join }}"
+    device_bind_network_file: "{{ (device.config_dir | default(sd_network_systemd_network_dir), '10-bind-' ~ device.device ~'.network') | path_join }}"
 
 # End of file
