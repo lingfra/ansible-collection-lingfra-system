@@ -1,0 +1,12 @@
+# {{ ansible_managed }}
+#
+# {{ vlan.files.vlan_netdev | default('N/A') }}
+
+[NetDev]
+Name={{ vlan.device_vlan }}
+Kind=vlan
+
+[VLAN]
+Id={{ vlan.id }}
+
+# End of file

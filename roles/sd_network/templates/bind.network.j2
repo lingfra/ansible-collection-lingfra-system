@@ -1,0 +1,13 @@
+# {{ ansible_managed }}
+#
+# {{ device_bind_network_file | default('N/A') }}
+
+[Match]
+Name={{ device.device }}
+
+[Network]
+{% for vlan in device_vlan_list_accumulated %}
+VLAN={{ vlan.id }}
+{% endfor %}
+
+# End of file

@@ -1,0 +1,11 @@
+# {{ ansible_managed }}
+#
+# {{ vlan.files.bridge_network | default('N/A') }}
+
+[Match]
+Name={{ vlan.device_bridge }}
+
+[Network]
+DHCP={{ 'yes' if vlan.dhcp else 'no' }}
+
+# End of file

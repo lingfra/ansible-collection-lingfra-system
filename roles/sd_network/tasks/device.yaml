@@ -1,0 +1,56 @@
+---
+# tasks file for sd_network
+
+# This tasks file is intended to be included from tasks/main.yaml.
+#
+# Expected variables:
+#
+#   - device (dict): Specification of on device configuration, fields:
+#       device (str): name of the device
+#       vlan_list (list / elements=dict): List of VLAN definitions, fields:
+#         id (int)
+#         dhcp (bool)
+#   - device_bind_network_file (str): Path of the file binding the device to
+#     the VLAN IDs.
+
+- name: "Set fact device_vlan_list_accumulated"
+  ansible.builtin.set_fact:
+    device_vlan_list_accumulated: "{{ device_vlan_list_accumulated | default([])
+      + [{
+          'device_bridge': device_bridge,
+          'device_vlan': device_vlan,
+          'dhcp': vlan.dhcp | default(sd_network_dhcp_default),
+          'id': vlan.id,
+          'files': {
+            'bridge_netdev': (sd_network_systemd_network_dir, '30-' ~ device_bridge ~ '.netdev') | path_join,
+            'bridge_network': (sd_network_systemd_network_dir, '50-' ~ device_bridge ~ '.network') | path_join,
+            'vlan_netdev': (sd_network_systemd_network_dir, '20-' ~ device_vlan ~ '.netdev') | path_join,
+            'vlan_network': (sd_network_systemd_network_dir, '40-' ~ device_vlan ~ '.network') | path_join,
+          }
+        }]
+      }}"
+  loop: "{{ device.vlan_list }}"
+  loop_control:
+    loop_var: vlan
+  vars:
+    device_bridge: "{{ device.device ~ 'br' ~ vlan.id }}"
+    device_vlan: "{{ device.device ~ 'vlan' ~ vlan.id }}"
+
+- name: "Template {{ device_bind_network_file }}"
+  ansible.builtin.template:
+    src: bind.network.j2
+    dest: "{{ device_bind_network_file }}"
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+
+- name: "Include tasks vlan.yaml"
+  ansible.builtin.include_tasks:
+    file: vlan.yaml
+  loop: "{{ device_vlan_list_accumulated }}"
+  loop_control:
+    loop_var: vlan
+    label: "{{ 'VLAN ' ~ vlan.id ~ ' on ' ~ device.device | default('N/A') }}"
+
+# End of file

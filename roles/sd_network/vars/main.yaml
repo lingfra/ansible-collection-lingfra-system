@@ -1,0 +1,6 @@
+---
+# vars file for sd_network
+
+sd_network_systemd_network_dir: /etc/systemd/network
+
+# End of file

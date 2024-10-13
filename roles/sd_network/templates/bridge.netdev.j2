@@ -1,0 +1,9 @@
+# {{ ansible_managed }}
+#
+# {{ vlan.files.bridge_netdev | default('N/A') }}
+
+[NetDev]
+Name={{ vlan.device_bridge }}
+Kind=bridge
+
+# End of file

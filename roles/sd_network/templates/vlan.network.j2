@@ -1,0 +1,11 @@
+# {{ ansible_managed }}
+#
+# {{ vlan.files.vlan_network | default('N/A') }}
+
+[Match]
+Name={{ vlan.device_vlan }}
+
+[Network]
+Bridge={{ vlan.device_bridge }}
+
+# End of file

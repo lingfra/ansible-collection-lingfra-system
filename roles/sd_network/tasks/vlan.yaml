@@ -1,44 +1,40 @@
 ---
 # tasks file for sd_network
 
-- name: Template 20-dev-vlan.netdev
+- name: "Template {{ vlan.files.vlan_netdev }}"
   ansible.builtin.template:
-    src: vlan-netdev.j2
-    dest: "{{ file_dest_path }}"
+    src: vlan.netdev.j2
+    dest: "{{ vlan.files.vlan_netdev }}"
     owner: root
     group: root
     mode: "0644"
-  vars:
-    file_dest_path: /etc/systemd/network/20-{{ vlan.dev_vlan }}.netdev
+  become: true
 
-- name: Template 30-dev-br.netdev
+- name: "Template {{ vlan.files.bridge_netdev }}"
   ansible.builtin.template:
-    src: br-netdev.j2
-    dest: "{{ file_dest_path }}"
+    src: bridge.netdev.j2
+    dest: "{{ vlan.files.bridge_netdev }}"
     owner: root
     group: root
     mode: "0644"
-  vars:
-    file_dest_path: /etc/systemd/network/30-{{ vlan.dev_br }}.netdev
+  become: true
 
-- name: Template 40-dev-vlan.network
+- name: "Template {{ vlan.files.vlan_network }}"
   ansible.builtin.template:
-    src: vlan-network.j2
-    dest: "{{ file_dest_path }}"
+    src: vlan.network.j2
+    dest: "{{ vlan.files.vlan_network }}"
     owner: root
     group: root
     mode: "0644"
-  vars:
-    file_dest_path: /etc/systemd/network/40-{{ vlan.dev_vlan }}.network
+  become: true
 
-- name: Template 50-dev-br.network
+- name: "Template {{ vlan.files.bridge_network }}"
   ansible.builtin.template:
-    src: br-network.j2
-    dest: "{{ file_dest_path }}"
+    src: bridge.network.j2
+    dest: "{{ vlan.files.bridge_network }}"
     owner: root
     group: root
     mode: "0644"
-  vars:
-    file_dest_path: /etc/systemd/network/50-{{ vlan.dev_br }}.network
+  become: true
 
 # End of file

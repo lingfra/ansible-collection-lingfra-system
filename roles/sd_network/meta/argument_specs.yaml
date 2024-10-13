@@ -1,0 +1,60 @@
+---
+# argument specs file for sd_network
+
+argument_specs:
+  main:
+    short_description: "Main entry point for sd_network role"
+    description:
+      - "This role is used to interpret tagged VLANs on (multiple) network devices (interfaces). To accomplish this, multiple concepts of [systemd-network](https://www.freedesktop.org/software/systemd/man/latest/systemd.network.html) are stacked."
+      - "This results in five levels of configuration:"
+      - ""
+      - "1. Bind interface to VLAN networks."
+      - "2. Define the VLAN networks."
+      - "3. Define a bridge for every VLAN."
+      - "4. Bind VLAN network to corresponding bridge."
+      - "5. Configure the bridge. Currently, the only option is to enable or disable DHCP."
+      - ""
+      - "Starting from this entry point, the tasks [`device.yaml`](./tasks/device.yaml) are included. This is done for every list item in [`sd_network_device_vlan_list`](#sd_network_device_vlan_list). The tasks in [`device.yaml`](./tasks/device.yaml) make the basic configuration for the corresponding network device and create an accumulated VLAN list, which is needed in the next step. The next step is to include the [`vlan.yaml`](./tasks/vlan.yaml) for every specified VLAN."
+    author:
+      - lingling
+    options:
+      sd_network_device_vlan_list:
+        type: "list"
+        elements: "dict"
+        default: []
+        description:
+          - "This list of dictionaries is the main configuration interface for this role."
+          - "Every list item consists of a device name and a list of VLANs, which should be interpreted from this device."
+          - "When this list is empty (the default) no actions are done."
+        options:
+          device:
+            type: "str"
+            required: true
+            description:
+              - "The device the VLANs should be bound to. Need to be present on the target host."
+          vlan_list:
+            type: "list"
+            elements: "dict"
+            required: true
+            description:
+              - "List of VLANs associated with the device."
+            options:
+              id:
+                type: "int"
+                required: true
+                description:
+                  - "Specifies the VLAN ID. This should be the same as configured in the router on the port."
+              dhcp:
+                type: "bool"
+                required: false
+                description:
+                  - "Whether DHCP should be activated on the resulting bridge or not."
+                  - "If unspecified the value of [`sd_network_dhcp_default`](#sd_network_dhcp_default) is used."
+      sd_network_dhcp_default:
+        type: "bool"
+        default: false
+        description:
+          - "This variable defines a fallback for the field `sd_network_device_vlan_list.vlan_list.dhcp`, refer to the documentation of that option for more information."
+          - "By default this is false to avoid accidently adding the host to multiple networks."
+
+# End of file
