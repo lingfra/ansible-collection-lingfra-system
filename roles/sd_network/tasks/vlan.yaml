@@ -18,6 +18,16 @@
     group: root
     mode: "0644"
   become: true
+  when:
+    - vlan.create_bridge
+
+- name: "Remove {{ vlan.files.bridge_netdev }}"
+  ansible.builtin.file:
+    path: "{{ vlan.files.bridge_netdev }}"
+    state: absent
+  become: true
+  when:
+    - not vlan.create_bridge
 
 - name: "Template {{ vlan.files.vlan_network }}"
   ansible.builtin.template:
@@ -36,5 +46,15 @@
     group: root
     mode: "0644"
   become: true
+  when:
+    - vlan.create_bridge
+
+- name: "Remove {{ vlan.files.bridge_network }}"
+  ansible.builtin.file:
+    path: "{{ vlan.files.bridge_network }}"
+    state: absent
+  become: true
+  when:
+    - not vlan.create_bridge
 
 # End of file

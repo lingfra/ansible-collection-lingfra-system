@@ -6,6 +6,10 @@
 Name={{ vlan.device_vlan }}
 
 [Network]
+{% if vlan.create_bridge %}
 Bridge={{ vlan.device_bridge }}
+{% else %}
+DHCP={{ 'yes' if vlan.dhcp else 'no' }}
+{% endif %}
 
 # End of file

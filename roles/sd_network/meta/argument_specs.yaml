@@ -44,12 +44,27 @@ argument_specs:
                 required: true
                 description:
                   - "Specifies the VLAN ID. This should be the same as configured in the router on the port."
+              create_bridge:
+                type: "bool"
+                required: false
+                description:
+                  - "Whether a bridge device for this VLAN should be created or not."
+                  - "If unspecified the value of `sd_network_create_bridge_default` is used."
+                  - "When this is set to `false`, the bridge configuration files (`30-bridge.netdev` and `50-bridge.network`) are not created . However, the filenames are still composed and used to delete possible leftover configuration from previous executions."
               dhcp:
                 type: "bool"
                 required: false
                 description:
-                  - "Whether DHCP should be activated on the resulting bridge or not."
+                  - "Whether DHCP should be activated on the resulting interface or not."
                   - "If unspecified the value of [`sd_network_dhcp_default`](#sd_network_dhcp_default) is used."
+                  - "Depending if a bridge for this VLAN is created or not, DHCP is activated at different places. When a bridge is assigned to the VLAN, then DHCP is specified in `50-bridge.network`. If the VLAN has no corresponding bridge DHCP is activated in `40-vlan.network`."
+
+      sd_network_create_bridge_default:
+        type: "bool"
+        default: true
+        description:
+          - "This variable defines a fallback for the field `sd_network_device_vlan_list.vlan_list.create_bridge`, refer to the documentation of that option for more information."
+          - "By default this is `true`. This leads to the creation of a bridge for every VLAN."
       sd_network_dhcp_default:
         type: "bool"
         default: false

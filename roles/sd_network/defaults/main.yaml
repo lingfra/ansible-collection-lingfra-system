@@ -4,6 +4,9 @@
 # Every list item consists of a device name and a list of VLANs, which should be interpreted from this device.
 # When this list is empty (the default) no actions are done.
 sd_network_device_vlan_list: []
+# This variable defines a fallback for the field `sd_network_device_vlan_list.vlan_list.create_bridge`, refer to the documentation of that option for more information.
+# By default this is `true`. This leads to the creation of a bridge for every VLAN.
+sd_network_create_bridge_default: true
 # This variable defines a fallback for the field `sd_network_device_vlan_list.vlan_list.dhcp`, refer to the documentation of that option for more information.
 # By default this is false to avoid accidently adding the host to multiple networks.
 sd_network_dhcp_default: false

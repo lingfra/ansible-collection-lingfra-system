@@ -17,6 +17,7 @@
   ansible.builtin.set_fact:
     device_vlan_list_accumulated: "{{ device_vlan_list_accumulated | default([])
       + [{
+          'create_bridge': vlan.create_bridge | default(sd_network_create_bridge_default),
           'device_bridge': device_bridge,
           'device_vlan': device_vlan,
           'dhcp': vlan.dhcp | default(sd_network_dhcp_default),

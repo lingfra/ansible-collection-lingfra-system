@@ -7,7 +7,7 @@ Name={{ device.device }}
 
 [Network]
 {% for vlan in device_vlan_list_accumulated %}
-VLAN={{ vlan.id }}
+VLAN={{ vlan.device_vlan }}
 {% endfor %}
 
 # End of file
