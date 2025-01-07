@@ -1,0 +1,14 @@
+---
+# meta file for apt_source
+
+dependencies: []
+
+galaxy_info:
+  author: lingling
+  description: Configure APT sources on Deb-based systems.
+  license: The Unlicense
+  min_ansible_version: "2.15"
+
+  platforms: []
+
+# End of file

@@ -1,0 +1,24 @@
+---
+# tasks file for apt_source
+
+- name: "Add APT Source"
+  ansible.builtin.deb822_repository:
+    name: "{{ repo.name }}"
+    architectures: "{{ repo.architectures | default(omit) }}"
+    components: "{{ repo.components | default(omit) }}"
+    enabled: "{{ repo.enabled | default(true) }}"
+    signed_by: "{{ repo.signed_by | default(omit) }}"
+    suites: "{{ repo.suites | default(omit) }}"
+    types: "{{ repo.types | default('deb') }}"
+    uris: "{{ repo.uris | default(omit) }}"
+  become: true
+  loop: "{{ apt_source_repo_list }}"
+  loop_control:
+    loop_var: repo
+    label: "{{ repo.name }}"
+  notify:
+    - Update APT cache
+  tags:
+    - configure
+
+# End of file

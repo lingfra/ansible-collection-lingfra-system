@@ -1,0 +1,9 @@
+---
+# handlers file for apt_source
+
+- name: Update APT cache
+  ansible.builtin.apt:
+    update_cache: true
+  become: true
+
+# End of file

@@ -1,0 +1,48 @@
+---
+# argument specs file for apt_source
+
+argument_specs:
+  main:
+    short_description: Main entry point for apt_source role
+    description:
+      - "This is a simple role, which deploys APT data sources based on the contents of `apt_source_repo_list`. Afterwards it updates the APT cache."
+    options:
+      apt_source_repo_list:
+        type: "list"
+        elements: "dict"
+        default: []
+        description:
+          - "List of repositories (_data sources_) to add for APT."
+          - "See [**sources.list(5)**](https://manpages.debian.org/stable/apt/sources.list.5.en.html) for an explanation of the options."
+        options:
+          architectures:
+            type: "str"
+            required: false
+          components:
+            type: "list"
+            elements: "str"
+            required: false
+          enabled:
+            type: "bool"
+            required: false
+          name:
+            type: "str"
+            required: true
+          signed_by:
+            type: "str"
+            required: false
+          suites:
+            type: "str"
+            required: false
+          types:
+            type: "list"
+            elements: "str"
+            required: false
+            choices:
+              - "deb"
+              - "deb-src"
+          uris:
+            type: "str"
+            required: false
+
+# End of file
