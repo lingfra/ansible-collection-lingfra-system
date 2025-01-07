@@ -1,0 +1,33 @@
+# Ansible Collection - lingfra.system
+
+An Ansible collection for managing and configuring core operating system
+functions.
+
+## Installation
+
+The collection can be obtained from the Git repository. This may be desirable to
+get the latest development version. The following `requirements.yaml` entry, can
+be used to download directly from Git:
+
+```yaml
+---
+collections:
+  - name: https://codeberg.org/lingfra/ansible-collection-lingfra-system
+    version: main
+    type: git
+```
+
+For more information, see the [Installing
+collections](https://docs.ansible.com/ansible/latest/collections_guide/collections_installing.html)
+section of the Ansible documentation.
+
+## License
+
+[The Unlicense](./LICENSE)
+
+## Author Information
+
+lingling ([Codeberg][Codeberg], [GitHub][GitHub])
+
+[Codeberg]: https://codeberg.org/lingling
+[GitHub]: https://github.com/lingling9000
