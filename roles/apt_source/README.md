@@ -46,6 +46,43 @@ List of repositories (_data sources_) to add for APT. See [**sources.list(5)**](
 
 None.
 
+## Example Playbook
+
+```yaml
+- name: Configure apt sources
+  hosts: all
+  tasks:
+    - name: Import role lingfra.system.apt_source
+      ansible.builtin.import_role:
+        name: lingfra.system.apt_source
+      vars:
+        apt_source_repo_list:
+          # add the backports suite for bookworm
+          - name: bookworm-backports
+            enabled: true
+            types:
+              - deb
+              - deb-src
+            uris:
+              - https://deb.debian.org/debian
+            suites: bookworm-backports
+            components:
+              - main
+              - contrib
+              - non-free
+              - non-free-firmware
+
+          # the postgresql upstream repository is signed by an external signature
+          - name: postgres-upstream
+            enabled: true
+            types: deb
+            signed_by: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+            architectures: amd64
+            uris: https://apt.postgresql.org/pub/repos/apt
+            suites: bookworm-pgdg
+            components: main
+```
+
 ## Project Information
 
 This role is part of the Ansible collection [lingfra.system][collection_url].
