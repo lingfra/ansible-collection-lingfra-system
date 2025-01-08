@@ -9,6 +9,8 @@ functions.
 
 - [apt_source](./roles/apt_source/README.md): Configure APT sources on Deb-based
 systems.
+- [sd_network](./roles/sd_network/README.md): Configure systemd-network to
+create VLANs and bridge devives.
 
 ## Installation
 
