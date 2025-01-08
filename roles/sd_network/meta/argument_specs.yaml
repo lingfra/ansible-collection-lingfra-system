@@ -75,6 +75,6 @@ argument_specs:
         default: false
         description:
           - "This variable defines a fallback for the field `sd_network_device_vlan_list.vlan_list.dhcp`, refer to the documentation of that option for more information."
-          - "By default this is false to avoid accidently adding the host to multiple networks."
+          - "By default this is `false` to avoid accidently adding the host to multiple networks."
 
 # End of file

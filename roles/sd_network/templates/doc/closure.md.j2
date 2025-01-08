@@ -1,0 +1,22 @@
+
+## Example Playbook
+
+```yaml
+- name: Configure VLANs and bridges
+  hosts: all
+  tasks:
+    - name: Import role lingfra.system.sd_network
+      ansible.builtin.import_role:
+        name: lingfra.system.sd_network
+      vars:
+        sd_network_device_vlan_list:
+          - device: enp3s0
+            vlan_list:
+              - id: 101
+                dhcp: true
+                create_bridge: false
+              - id: 102
+                dhcp: false
+              - id: 103
+              - id: 104
+```
