@@ -3,6 +3,13 @@
 An Ansible collection for managing and configuring core operating system
 functions.
 
+## Included Content
+
+### Roles
+
+- [apt_source](./roles/apt_source/README.md): Configure APT sources on Deb-based
+systems.
+
 ## Installation
 
 The collection can be obtained from the Git repository. This may be desirable to
