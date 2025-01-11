@@ -1,0 +1,36 @@
+
+The original motivation for this role was to define the
+[**mkinitcpio(8)**](https://man.archlinux.org/man/mkinitcpio.8.en) configuration
+in Ansible `host_vars`. Especially for the `HOOKS=` array, it is important that
+the required hooks are loaded in the correct order. I ended up repeatedly
+reading the [mkinitcpio ArchWiki
+entry](https://wiki.archlinux.org/title/Mkinitcpio) to validate my configuration
+on various hosts. With this role, it is possible to manage all mkinitcpio
+configurations in one central location: the Ansible inventory. The bash arrays
+contained in `/etc/mkinitcpio.conf` can be configured using YAML lists, which
+are much more reader friendly. In addition, the YAML lists allow for clearer
+comments on individual modules.
+
+## Features
+
+- Template `mkinitcpio.conf`. Any configuration value can be templated, see
+[templates/mkinitcpio.conf.j2](./templates/mkinitcpio.conf.j2).
+- Customizable path to `mkinitcpio.conf` with the variable
+[`mkinitcpio_conf_path`](#mkinitcpio_conf_path).
+- Support for chrooted environment, see
+[`mkinitcpio_chroot_dir`](#mkinitcpio_chroot_dir).
+- Build the initramfs.
+  - Restores previous configuration and rebuilds in case of failure.
+- Optionally import
+[lingfra.system.mkinitcpio_sd_tool](https://codeberg.org/lingfra/ansible-collection-lingfra-system/src/branch/main/roles/mkinitcpio_sd_tool/README.md)
+to configure remote root device unlocking over SSH. See
+[`mkinitcpio_sd_tool_enable`](#mkinitcpio_sd_tool_enable).
+
+## Requirements
+
+A system that uses
+[mkinitcpio](https://gitlab.archlinux.org/archlinux/mkinitcpio/mkinitcpio/) for
+initramfs generation. This properly is the case when using [Arch
+Linux](https://archlinux.org/).
+
+This role has only been tested on Arch Linux machines.

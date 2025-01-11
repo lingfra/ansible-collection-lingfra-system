@@ -1,14 +1,6 @@
 ---
 # vars file for mkinitcpio
 
-# mkinitcpio: List of dependencies needed for systemd-tool to work.
-mkinitcpio_systemd_tool_packages:
-  - mkinitcpio-systemd-tool
-  - busybox
-  - cryptsetup
-  - openssh
-  - tinyssh
-  - tinyssh-convert
-  - mc
-
-# End of file
+mkinitcpio_built_command_argv:
+  - "mkinitcpio"
+  - "-P"

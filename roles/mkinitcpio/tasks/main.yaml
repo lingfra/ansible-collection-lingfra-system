@@ -1,143 +1,98 @@
 ---
 # tasks file for mkinitcpio
 
-- name: Check public role variables
+# ---------- Checks ----------
+
+- name: "Validate internal role variables"
+  ansible.builtin.validate_argument_spec:
+    argument_spec: "{{ (lookup('ansible.builtin.file', 'meta/argument_specs.yaml')
+        | from_yaml)['argument_specs']['internal']['options'] }}"
+  tags:
+    - checks
+    - mkinitcpio
+
+- name: "Check mkinitcpio hooks requirements for systemd-tool"
   ansible.builtin.assert:
     that:
-      # mkinitcpio_build_initramfs is a boolean
-      - mkinitcpio_build_initramfs is defined
-      - mkinitcpio_build_initramfs is not none
-      - mkinitcpio_build_initramfs is boolean
+      - ('base' in mkinitcpio_conf_hooks)
+      - ('systemd' in mkinitcpio_conf_hooks)
+      - ('sd-encrypt' not in mkinitcpio_conf_hooks)
+      - ('systemd-tool' in mkinitcpio_conf_hooks)
+    fail_msg: |
+      mkinitcpio-systemd-tool requires following hooks:
 
-      # mkinitcpio_conf_binaries is a list
-      - mkinitcpio_conf_binaries is defined
-      - mkinitcpio_conf_binaries is not none
-      - mkinitcpio_conf_binaries is not string
-      - mkinitcpio_conf_binaries is not mapping
-      - mkinitcpio_conf_binaries is iterable
+        - base
+        - systemd
+        - systemd-tool
 
-      # mkinitcpio_conf_files is a list
-      - mkinitcpio_conf_files is defined
-      - mkinitcpio_conf_files is not none
-      - mkinitcpio_conf_files is not string
-      - mkinitcpio_conf_files is not mapping
-      - mkinitcpio_conf_files is iterable
-
-      # mkinitcpio_conf_hooks is a list
-      - mkinitcpio_conf_hooks is defined
-      - mkinitcpio_conf_hooks is not none
-      - mkinitcpio_conf_hooks is not string
-      - mkinitcpio_conf_hooks is not mapping
-      - mkinitcpio_conf_hooks is iterable
-
-      # mkinitcpio_conf_modules is a list
-      - mkinitcpio_conf_modules is defined
-      - mkinitcpio_conf_modules is not none
-      - mkinitcpio_conf_modules is not string
-      - mkinitcpio_conf_modules is not mapping
-      - mkinitcpio_conf_modules is iterable
-
-      # mkinitcpio_conf_compression is a string
-      - (mkinitcpio_conf_compression is not defined) or (mkinitcpio_conf_compression is not none)
-      - (mkinitcpio_conf_compression is not defined) or (mkinitcpio_conf_compression is string)
-      - (mkinitcpio_conf_compression is not defined) or (mkinitcpio_conf_compression | length > 0)
-
-      # mkinitcpio_conf_compression_options  is a string
-      - (mkinitcpio_conf_compression_options  is not defined) or (mkinitcpio_conf_compression_options  is not none)
-      - (mkinitcpio_conf_compression_options  is not defined) or (mkinitcpio_conf_compression_options  is string)
-      - (mkinitcpio_conf_compression_options  is not defined) or (mkinitcpio_conf_compression_options  | length > 0)
-
-      # mkinitcpio_conf_modules_decompress is a string
-      - (mkinitcpio_conf_modules_decompress is not defined) or (mkinitcpio_conf_modules_decompress is not none)
-      - (mkinitcpio_conf_modules_decompress is not defined) or (mkinitcpio_conf_modules_decompress is string)
-      - (mkinitcpio_conf_modules_decompress is not defined) or (mkinitcpio_conf_modules_decompress | length > 0)
-
-      # mkinitcpio_conf_path is a string
-      - mkinitcpio_conf_path is defined
-      - mkinitcpio_conf_path is not none
-      - mkinitcpio_conf_path is string
-      - mkinitcpio_conf_path | length > 0
-
-      # mkinitcpio_systemd_tool_setup is a boolean
-      - mkinitcpio_systemd_tool_setup is defined
-      - mkinitcpio_systemd_tool_setup is not none
-      - mkinitcpio_systemd_tool_setup is boolean
-
-      # mkinitcpio_systemd_tool_crypttab_entry is a list
-      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_crypttab_entry is defined)
-      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_crypttab_entry is not none)
-      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_crypttab_entry is not string)
-      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_crypttab_entry is not mapping)
-      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_crypttab_entry is iterable)
-      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_crypttab_entry | length >= 2)
-      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_crypttab_entry | length <= 4)
-
-      # mkinitcpio_systemd_tool_fstab_entry is a list
-      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_fstab_entry is defined)
-      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_fstab_entry is not none)
-      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_fstab_entry is not string)
-      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_fstab_entry is not mapping)
-      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_fstab_entry is iterable)
-      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_fstab_entry | length == 6)
-
-      # mkinitcpio_systemd_tool_ssh_pub_key is a string
-      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_ssh_pub_key is defined)
-      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_ssh_pub_key is not none)
-      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_ssh_pub_key is string)
-      - (not mkinitcpio_systemd_tool_setup) or (mkinitcpio_systemd_tool_ssh_pub_key | length > 0)
-    fail_msg: Bad syntax for public role variables.
-    success_msg: All assertions passed.
+      It is also mutually exclusive with sd-encrypt, because it replaces its functionally.
+    success_msg: mkinitcpio hook requirements for systemd-tool given.
     quiet: true
-
-- name: Set internal fact mkinitcpio_internal_ssh_pub_key
-  ansible.builtin.set_fact:
-    mkinitcpio_internal_ssh_pub_key: "{{ lookup('env', 'HOME') }}/.ssh/{{ mkinitcpio_systemd_tool_ssh_pub_key }}"
+  tags:
+    - checks
+    - mkinitcpio
   when:
-    - mkinitcpio_systemd_tool_setup
+    - mkinitcpio_sd_tool_enable
 
-- name: Include sytemd-tool checks
-  ansible.builtin.include_tasks:
-    file: systemd-tool-checks.yaml
+# ---------- mkinitcpio-systemd-tool ----------
+
+- name: Import role lingfra.system.mkinitcpio_sd_tool
+  ansible.builtin.import_role:
+    name: lingfra.system.mkinitcpio_sd_tool
+  vars:
+    mkinitcpio_sd_tool_chroot_dir: "{{ mkinitcpio_chroot_dir | default('') }}"
   when:
-    - mkinitcpio_systemd_tool_setup
+    mkinitcpio_sd_tool_enable
 
-- name: Include sytemd-tool tasks
-  ansible.builtin.include_tasks:
-    file: systemd-tool.yaml
-  when:
-    - mkinitcpio_systemd_tool_setup
-  register: setup_systemd_tool
+# ---------- Configuration ----------
 
-- name: Template mkinitcpio.conf
+- name: "Template mkinitcpio.conf"
   ansible.builtin.template:
     src: mkinitcpio.conf.j2
-    dest: "{{ mkinitcpio_conf_path }}"
+    dest: "{{ mkinitcpio_conf_path | lingfra.system.path_under_chroot(mkinitcpio_chroot_dir | default(none)) }}"
     owner: root
     group: root
     mode: "0644"
     backup: true
   become: true
   diff: true
-  register: template_mkinitcpio
+  tags:
+    - configuration
+    - mkinitcpio
+  register: template_mkinitcpio_result
 
-- name: Write backup file to variable
+- name: "Set fact mkinitcpio_conf_backup_file"
   ansible.builtin.set_fact:
-    mkinitcpio_conf_backup_file: "{{ template_mkinitcpio.backup_file }}"
-  when: template_mkinitcpio.backup_file is defined
+    mkinitcpio_conf_backup_file: "{{ template_mkinitcpio_result.backup_file | default(none) }}"
 
-- name: Build initramfs
+# ---------- Building ----------
+
+- name: "Build initramfs"
+  tags:
+    - build
+    - mkinitcpio
+
   when:
     - mkinitcpio_build_initramfs
-    - template_mkinitcpio.changed
-    # ToDo: Build initramfs also when there are changed for systemd-tool.
+    - template_mkinitcpio_result.changed or (mkinitcpio_sd_tool_changed | default(false))
 
   block:
-    - name: Include tasks build_initramfs
+    - name: "Include tasks build_initramfs"
       ansible.builtin.include_tasks:
         file: build_initramfs.yaml
+        apply:
+          tags:
+            - build
+            - mkinitcpio
 
   rescue:
-    - name: Restore old mkinitcpio.conf file
+    - name: "Fail if no backup file is found"
+      ansible.builtin.fail:
+        msg: "The creation of the initramfs image failed and there is no backup file to restore."
+      when:
+        - not mkinitcpio_conf_backup_file
+
+    - name: "Restore mkinitcpio.conf file from backup"
       ansible.builtin.copy:
         remote_src: true
         src: "{{ mkinitcpio_conf_backup_file }}"
@@ -147,28 +102,32 @@
         mode: "0644"
       become: true
 
-    - name: Include tasks build_initramfs for old configuration.
+    - name: "Include tasks build_initramfs for old configuration"
       ansible.builtin.include_tasks:
         file: build_initramfs.yaml
+        apply:
+          tags:
+            - build
+            - mkinitcpio
 
-  always:
-    - name: Nullify command_mkinitcpio variable
-      ansible.builtin.set_fact:
-        command_mkinitcpio: null
+# ---------- Clean-Up ----------
 
-- name: Delete backup file if exists
+- name: "Remove mkinitcpio.conf backup file"
   ansible.builtin.file:
     path: "{{ mkinitcpio_conf_backup_file }}"
     state: absent
   become: true
-  diff: true
+  tags:
+    - clean-up
+    - mkinitcpio
   when:
-    - mkinitcpio_conf_backup_file is defined
+    - mkinitcpio_conf_backup_file
 
-- name: Nullify runtime variables
+- name: "Nullify runtime variables for mkinitcpio"
   ansible.builtin.set_fact:
-    template_mkinitcpio: null
+    mkinitcpio_built_result: null
     mkinitcpio_conf_backup_file: null
-    mkinitcpio_internal_ssh_pub_key: null
-
-# End of file
+    template_mkinitcpio_result: null
+  tags:
+    - clean-up
+    - mkinitcpio

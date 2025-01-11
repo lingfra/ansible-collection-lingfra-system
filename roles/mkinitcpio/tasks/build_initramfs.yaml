@@ -1,19 +1,17 @@
 ---
 # tasks file for mkinitcpio
 
-- name: Execute mkinitcpio to build initramfs
+- name: "Execute mkinitcpio to build initramfs"
   ansible.builtin.command:
-    cmd: mkinitcpio -P
+    argv: "{{ mkinitcpio_built_command_argv | lingfra.system.arch_chroot_argv(mkinitcpio_chroot_dir | default(none)) }}"
   become: true
   changed_when: true
-  register: command_mkinitcpio
+  register: mkinitcpio_built_result
 
-- name: Print output from mkinitcpio
+- name: "Print output from mkinitcpio"
   ansible.builtin.debug:
     msg: "{{ lookup('ansible.builtin.template', 'command_output.j2') }}"
   vars:
-    command: "{{ command_mkinitcpio }}"
+    command: "{{ mkinitcpio_built_result }}"
   when:
-    - command_mkinitcpio.rc == 0
-
-# End of file
+    - mkinitcpio_built_result.rc == 0

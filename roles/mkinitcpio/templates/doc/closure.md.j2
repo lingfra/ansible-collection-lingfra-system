@@ -1,0 +1,26 @@
+
+## Example Playbook
+
+```yaml
+- name: Import playbook lingfra.system.mkinitcpio
+  ansible.builtin.import_playbook: lingfra.system.mkinitcpio
+  vars:
+    mkinitcpio_conf_hooks:
+      - "base"
+      - "systemd"
+      - "autodetect"
+      - "microcode"
+      - "modconf"
+      - "kms"
+      - "keyboard"
+      - "sd-vconsole"
+      - "block"
+      - "filesystems"
+      - "fsck"
+      - "systemd-tool"
+    mkinitcpio_sd_tool_enable: true
+    mkinitcpio_sd_tool_crypttab_entries:
+      - name: root
+        uuid: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+    mkinitcpio_sd_tool_ssh_pub_key: ssh-ed25519 AAAAXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX your key comment
+```

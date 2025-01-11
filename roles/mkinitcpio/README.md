@@ -1,122 +1,173 @@
-# Ansible Role: mkinitcpio
+<!-- BEGIN_ANSIBLE_DOCS -->
+# Ansible Role: lingfra.system.mkinitcpio
 
-Installs and configures
-[mkinitcpio](https://gitlab.archlinux.org/archlinux/mkinitcpio/mkinitcpio/).
-Optionally setup
-[mkinitcpio-systemd-tool](https://github.com/random-archer/mkinitcpio-systemd-tool)
-for remote root device decryption over SSH.
+Configures mkinitcpio and builds the initramfs.
 
-The initial motivation behind this role was to define mkinitcpio configuration
-in Ansible `host_vars`. Especially for the `HOOKS=` array it is important that
-the necessary hooks are loaded in the right order. I repeatedly ended up reading
-the [mkinitcpio ArchWiki entry](https://wiki.archlinux.org/title/Mkinitcpio) to
-validate my configuration on diverse hosts. With this role it is possible to
-manage all mkinitcpio configurations in a central space: the Ansible playbook
-directory. The bash arrays contained in `/etc/mkinitcpio.conf` can be configured
-with YAML lists, which are much more reader-friendly. In addition the YAML lists
-allow clearer comments to single modules.
+The original motivation for this role was to define the
+[**mkinitcpio(8)**](https://man.archlinux.org/man/mkinitcpio.8.en) configuration
+in Ansible `host_vars`. Especially for the `HOOKS=` array, it is important that
+the required hooks are loaded in the correct order. I ended up repeatedly
+reading the [mkinitcpio ArchWiki
+entry](https://wiki.archlinux.org/title/Mkinitcpio) to validate my configuration
+on various hosts. With this role, it is possible to manage all mkinitcpio
+configurations in one central location: the Ansible inventory. The bash arrays
+contained in `/etc/mkinitcpio.conf` can be configured using YAML lists, which
+are much more reader friendly. In addition, the YAML lists allow for clearer
+comments on individual modules.
 
 ## Features
 
-- Template `mkinitcpio.conf`. Every configuration value can be templated, see
+- Template `mkinitcpio.conf`. Any configuration value can be templated, see
 [templates/mkinitcpio.conf.j2](./templates/mkinitcpio.conf.j2).
-- Customize path of `mkinitcpio.conf`. Useful when configuring within a chrooted
-environment, e. g. when installing Arch Linux.
+- Customizable path to `mkinitcpio.conf` with the variable
+[`mkinitcpio_conf_path`](#mkinitcpio_conf_path).
+- Support for chrooted environment, see
+[`mkinitcpio_chroot_dir`](#mkinitcpio_chroot_dir).
 - Build the initramfs.
-  - Restores previous configuration in case of an error.
-- Install and configure `mkinitcpio-systemd-tool` for remote device decryption
-over SSH.
-
-## Limitations
-
-- Does only re-create the initramfs when `mkinitcpio.conf` is changed. For
-changes of the `mkinitcpio-systemd-tool` configuration you need to execute
-`mkinitcpio -P` manually.
-- `mkinitcpio-systemd-tool` specific: By default, the timeout for entering the
-password takes effect after 90 seconds. It is possible to add the `timeout=`
-parameter in the 4th field in the crypttab configuration. While
-**[systemd-cryptsetup-generator(8)](https://man.archlinux.org/man/core/systemd/systemd-cryptsetup-generator.8.en)**
-respects this and sets the timeout in the resulting
-`systemd-cryptsetup@root.service` in the initramfs this does work only
-partially. When defining a timeout less than 90 seconds the timeout takes effect
-then. But setting a timeout higher than 90 seconds has not effect. A workaround
-is to set `rootflags=x-systemd.device-timeout=0` (0 disables timeout) in the
-kernel command line. This role does not modify kernel parameters and therefore
-this need to be done manually if desired. See also
-<https://wiki.archlinux.org/title/Dm-crypt/System_configuration#Timeout>.
+  - Restores previous configuration and rebuilds in case of failure.
+- Optionally import
+[lingfra.system.mkinitcpio_sd_tool](https://codeberg.org/lingfra/ansible-collection-lingfra-system/src/branch/main/roles/mkinitcpio_sd_tool/README.md)
+to configure remote root device unlocking over SSH. See
+[`mkinitcpio_sd_tool_enable`](#mkinitcpio_sd_tool_enable).
 
 ## Requirements
 
-A system using
+A system that uses
 [mkinitcpio](https://gitlab.archlinux.org/archlinux/mkinitcpio/mkinitcpio/) for
-initramfs generation. This properly is the case then using [Arch
+initramfs generation. This properly is the case when using [Arch
 Linux](https://archlinux.org/).
 
-This role has been tested only on Arch Linux machines.
+This role has only been tested on Arch Linux machines.
 
-## Role Variables
+## Supported Platforms
 
-### External Variables
+Not specified.
 
-None.
+## Role Arguments
 
-### Public Role Variables
+### Entrypoint `main` - Main entry point for mkinitcpio role
 
-Control flow and meta variables:
+The main scope of this role's entrypoint is to template the `mkinitcpio` configuration and then build the initramfs.
+If it is not desired to build the initramfs, it is possible to disable it by setting [`mkinitcpio_build_initramfs`](#mkinitcpio_build_initramfs) to `false`.
+Note that it is not recommended to disable the building of the initramfs, because this role has error handling and restoring mechanisms built in.
 
-- `mkinitcpio_build_initramfs` (boolean), default `true`. Wether initramfs
-should be build or not.
-- `mkinitcpio_conf_path` (string), default `"/etc/mkinitcpio.conf"`. Path of the
-mkinitcpio config file.
-- `mkinitcpio_systemd_tool_setup` (boolean), default `false`. Wether
-systemd-tool should be installed and configured or not.
+All available fields for `mkinitcpio.conf` are available as template variables.
+The bash arrays are defined here as YAML lists and converted to bash arrays in the template.
+Refer to [**mkinitcpio.conf(5)**](https://man.archlinux.org/man/mkinitcpio.conf.5) for a description of the options.
+Another useful resource is the example `mkinitcpio.conf` in the [upstream repository](https://gitlab.archlinux.org/archlinux/mkinitcpio/mkinitcpio/-/blob/master/mkinitcpio.conf).
 
-The main scope of this role is to template the `mkinitcpio` configuration. All
-available fields of `mkinitcpio.conf` are available as template variables. Refer
-to **[mkinitcpio.conf(5)](https://man.archlinux.org/man/mkinitcpio.conf.5)** for
-a description. Another useful resource is the example `mkinitcpio.conf` in the
-[upstream repository](https://gitlab.archlinux.org/archlinux/mkinitcpio/mkinitcpio/-/blob/master/mkinitcpio.conf).
-For the sake of readability the bash arrays are defined as YAML lists here and
-converted to bash arrays in the template. Following variables are available:
+See [`mkinitcpio_sd_tool_enable`](#mkinitcpio_sd_tool_enable) to install and configure mkinitcpio-systemd-tool for remote root device unlocking over SSH.
 
-- `mkinitcpio_conf_binaries` (list), default `[]`.
-- `mkinitcpio_conf_files` (list), default `[]`.
-- `mkinitcpio_conf_hooks` (list), default `["base", "udev", "autodetect",
-"microcode", "modconf", "kms", "keyboard", "keymap", "consolefont", "block",
-"filesystems", "fsck"]`.
-- `mkinitcpio_conf_modules` (list), default `[]`.
-- `mkinitcpio_conf_compression` (string), default undefined.
-- `mkinitcpio_conf_compression_options ` (string), default undefined.
-- `mkinitcpio_conf_modules_decompress` (string), default undefined.
+#### `mkinitcpio_build_initramfs`
 
-Following variables are for configuring systemd-tool. They only need to be
-modified if you set `mkinitcpio_systemd_tool_setup` to `true`:
+Type: `bool`, Default: `True`.
 
-- `mkinitcpio_systemd_tool_crypttab_entry` (list): One entry for the crypttab of
-systemd-tool, which lays under `/etc/mkinitcpio-systemd-tool/config/crypttab`. A
-list with a maximum of 4 fields is expected. The four fields correspondent to
-the fields of crypttab (name, device, password and options), see
-**[crypttab(5)](https://man.archlinux.org/man/crypttab.5.en)** for details and
-the [defaults](./defaults/main.yaml) for an example. Customizing this variable
-**is mandatory** when using systemd-tool.
-- `mkinitcpio_systemd_tool_fstab_entry` (list): One entry for the fstab of
-systemd-tool, which lays under `/etc/mkinitcpio-systemd-tool/config/fstab`. A
-list with 6 fields is expected. The six fields correspondent to fstab (device,
-dir, type, options, dump, fsck), see
-**[fstab(5)](https://man.archlinux.org/man/fstab.5)** for details and the
-[defaults](./defaults/main.yaml) for an example. Customizing this variable **is
-mandatory** if your mapped device has another name than `root`.
-- `mkinitcpio_systemd_tool_ssh_pub_key` (string), default `id_ed25519`. SSH
-public key for early userspace unlocking access. Need to exist under `~/.ssh/`
-on the control host. As systemd-tool uses tinysshd as SSH server only keys of
-type ed25519 are supported, see
-**[tinysshd(8)](https://man.archlinux.org/man/tinysshd.8.en)**.
+Whether initramfs should be build or not.
 
-### Internal Role Variables
+#### `mkinitcpio_chroot_dir`
 
-- `mkinitcpio_systemd_tool_packages` (list): Dependencies needed for
-systemd-tool to work.
+Type: `str`, optional.
+
+If you are configuring mkinitcpio in a chroot, set this variable to the directory where the chroot is located. This path will then prepended to the [`mkinitcpio_conf_path`](#mkinitcpio_conf_path) and the initramfs image will be built in the chroot.
+
+#### `mkinitcpio_conf_path`
+
+Type: `str`, Default: `/etc/mkinitcpio.conf`.
+
+Path of the mkinitcpio configuration file.
+
+#### `mkinitcpio_conf_binaries`
+
+Type: `list of 'str'`, Default: `[]`.
+
+Refer to [**mkinitcpio.conf(5)**](https://man.archlinux.org/man/mkinitcpio.conf.5) variable `BINARIES`.
+
+#### `mkinitcpio_conf_compression`
+
+Type: `str`, optional.
+
+Refer to [**mkinitcpio.conf(5)**](https://man.archlinux.org/man/mkinitcpio.conf.5) variable `COMPRESSION`.
+
+#### `mkinitcpio_conf_compression_options`
+
+Type: `str`, optional.
+
+Refer to [**mkinitcpio.conf(5)**](https://man.archlinux.org/man/mkinitcpio.conf.5) variable `COMPRESSION_OPTIONS`.
+
+#### `mkinitcpio_conf_files`
+
+Type: `list of 'str'`, Default: `[]`.
+
+Refer to [**mkinitcpio.conf(5)**](https://man.archlinux.org/man/mkinitcpio.conf.5) variable `FILES`.
+
+#### `mkinitcpio_conf_hooks`
+
+Type: `list of 'str'`, Default: `['base', 'udev', 'autodetect', 'microcode', 'modconf', 'kms', 'keyboard', 'keymap', 'consolefont', 'block', 'filesystems', 'fsck']`.
+
+Refer to [**mkinitcpio.conf(5)**](https://man.archlinux.org/man/mkinitcpio.conf.5) variable `HOOKS`. In addition, see the [Common Hooks](https://wiki.archlinux.org/title/Mkinitcpio#Common_hooks) section of the [Mkinitcpio article in the Arch Wiki](https://wiki.archlinux.org/title/Mkinitcpio).
+
+#### `mkinitcpio_conf_modules`
+
+Type: `list of 'str'`, Default: `[]`.
+
+Refer to [**mkinitcpio.conf(5)**](https://man.archlinux.org/man/mkinitcpio.conf.5) variable `MODULES`.
+
+#### `mkinitcpio_conf_modules_decompress`
+
+Type: `str`, optional.
+
+Refer to [**mkinitcpio.conf(5)**](https://man.archlinux.org/man/mkinitcpio.conf.5) variable `MODULES_DECOMPRESS`.
+
+#### `mkinitcpio_sd_tool_enable`
+
+Type: `bool`, Default: `False`.
+
+Whether or not to install and configure [mkinitcpio-systemd-tool](https://github.com/random-archer/mkinitcpio-systemd-tool). If set to `true`, the role [lingfra.system.mkinitcpio_sd_tool](https://codeberg.org/lingfra/ansible-collection-lingfra-system/src/branch/main/roles/mkinitcpio_sd_tool/README.md) will be imported.
+
+### Entrypoint `internal` - General internal role variables
+
+This is a synthetic entry point, which is used for custom argument validation and documentation. Your playbook will fail if you use this entry point.
+
+#### `mkinitcpio_built_command_argv`
+
+Type: `list of 'str'`, **required**.
+
+The command to built the initramfs image.
 
 ## Dependencies
 
 None.
+
+## Example Playbook
+
+```yaml
+- name: Import playbook lingfra.system.mkinitcpio
+  ansible.builtin.import_playbook: lingfra.system.mkinitcpio
+  vars:
+    mkinitcpio_conf_hooks:
+      - "base"
+      - "systemd"
+      - "autodetect"
+      - "microcode"
+      - "modconf"
+      - "kms"
+      - "keyboard"
+      - "sd-vconsole"
+      - "block"
+      - "filesystems"
+      - "fsck"
+      - "systemd-tool"
+    mkinitcpio_sd_tool_enable: true
+    mkinitcpio_sd_tool_crypttab_entries:
+      - name: root
+        uuid: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+    mkinitcpio_sd_tool_ssh_pub_key: ssh-ed25519 AAAAXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX your key comment
+```
+
+## Project Information
+
+This role is part of the Ansible collection [lingfra.system][collection_url].
+For more information, see the collections [README](../../README.md) file.
+
+[collection_url]: https://codeberg.org/lingfra/ansible-collection-lingfra-system
+<!-- END_ANSIBLE_DOCS -->
