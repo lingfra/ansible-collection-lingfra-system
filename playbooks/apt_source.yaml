@@ -1,0 +1,12 @@
+---
+# Playbook lingfra.system.apt_source
+
+- name: "Configure APT sources for Debian based systems"
+  hosts: "{{ target | default('all') }}"
+  gather_facts: true
+  tags:
+    - apt_source
+  tasks:
+    - name: "Import role lingfra.system.apt_source"
+      ansible.builtin.import_role:
+        name: lingfra.system.apt_source

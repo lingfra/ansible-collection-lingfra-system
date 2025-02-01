@@ -14,6 +14,7 @@ create VLANs and bridge devives.
 
 ### Playbooks
 
+- [apt_source](./playbooks/apt_source.yaml)
 - [sd_network](./playbooks/sd_network.yaml)
 
 ## Installation

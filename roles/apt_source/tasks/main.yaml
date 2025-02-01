@@ -19,6 +19,7 @@
   notify:
     - Update APT cache
   tags:
+    - apt_source
     - configure
 
 # End of file
