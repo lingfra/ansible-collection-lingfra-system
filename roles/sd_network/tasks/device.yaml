@@ -54,6 +54,10 @@
 - name: "Include tasks vlan.yaml"
   ansible.builtin.include_tasks:
     file: vlan.yaml
+    apply:
+      tags:
+        - sd_network
+        - configure
   loop: "{{ device_vlan_list_accumulated }}"
   loop_control:
     loop_var: vlan

@@ -12,6 +12,10 @@ systems.
 - [sd_network](./roles/sd_network/README.md): Configure systemd-network to
 create VLANs and bridge devives.
 
+### Playbooks
+
+- [sd_network](./playbooks/sd_network.yaml)
+
 ## Installation
 
 The collection can be obtained from the Git repository. This may be desirable to

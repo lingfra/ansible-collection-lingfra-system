@@ -1,0 +1,12 @@
+---
+# Playbook lingfra.system.sd_network
+
+- name: "Configure systemd networks"
+  hosts: "{{ target | default('all') }}"
+  gather_facts: true
+  tags:
+    - sd_network
+  tasks:
+    - name: "Import role lingfra.system.sd_network"
+      ansible.builtin.import_role:
+        name: lingfra.system.sd_network

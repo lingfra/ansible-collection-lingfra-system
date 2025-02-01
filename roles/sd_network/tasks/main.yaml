@@ -4,6 +4,10 @@
 - name: "Include tasks device.yaml"
   ansible.builtin.include_tasks:
     file: device.yaml
+    apply:
+      tags:
+        - sd_network
+        - configure
   loop: "{{ sd_network_device_vlan_list }}"
   loop_control:
     loop_var: device
