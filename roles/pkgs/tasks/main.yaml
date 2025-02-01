@@ -1,0 +1,49 @@
+---
+# tasks file for pkgs
+
+- name: "Print merge candidates for present and absent package lists"
+  ansible.builtin.debug:
+    msg: |
+      - pkgs_present__host: {{ pkgs_present__host }}
+      - pkgs_present__global['{{ ansible_distribution ~ ansible_distribution_major_version }}']: {{ pkgs_present__global[ansible_distribution ~ ansible_distribution_major_version] | default([]) }}
+      - pkgs_present__global['{{ ansible_distribution }}']: {{ pkgs_present__global[ansible_distribution] | default([]) }}
+      - pkgs_present__global['all']: {{ pkgs_present__global['all'] | default([]) }}
+
+      - pkgs_absent__host: {{ pkgs_absent__host }}
+      - pkgs_absent__global['{{ ansible_distribution ~ ansible_distribution_major_version }}']: {{ pkgs_absent__global[ansible_distribution ~ ansible_distribution_major_version] | default([]) }}
+      - pkgs_absent__global['{{ ansible_distribution }}']: {{ pkgs_absent__global[ansible_distribution] | default([]) }}
+      - pkgs_absent__global['all']: {{ pkgs_absent__global['all'] | default([]) }}
+    verbosity: 2
+
+- name: "Print merged present and absent package lists"
+  ansible.builtin.debug:
+    msg: |
+      - pkgs_absent: {{ pkgs_absent }}
+      - pkgs_present: {{ pkgs_present }}
+
+# ---------- Checks ----------
+
+- name: "Verify present and absent pkg lists are disjoint sets"
+  ansible.builtin.assert:
+    that:
+      - pkgs_intersection | length == 0
+    fail_msg: >
+      The lists pkgs_present and pkgs_absent need to be disjoint sets. The
+      following packages appear in both sets: {{ pkgs_intersection }}.
+    success_msg: The lists pkgs_present and pkgs_absent have no items in common.
+    quiet: true
+  vars:
+    pkgs_intersection: "{{ pkgs_present | ansible.builtin.intersect(pkgs_absent) }}"
+
+# ---------- Configuration ----------
+
+- name: "Include package manager specific tasks"
+  ansible.builtin.include_tasks:
+    file: "manage_pkgs_{{ ansible_pkg_mgr }}.yaml"
+    apply:
+      tags:
+        - configure
+        - pkgs
+  tags:
+    - configure
+    - pkgs

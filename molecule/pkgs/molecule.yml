@@ -1,0 +1,46 @@
+---
+driver:
+  name: podman
+platforms:
+  - name: system-pkgs-alpine320
+    image: docker.io/library/alpine:3.20
+    pre_build_image: false
+  - name: system-pkgs-alpine321
+    image: docker.io/library/alpine:3.21
+    pre_build_image: false
+  - name: system-pkgs-archlinux
+    dockerfile: Containerfile.archlinux
+    image: docker.io/library/archlinux:latest
+    pre_build_image: false
+  - name: system-pkgs-debian11
+    image: docker.io/library/debian:11
+    pre_build_image: false
+  - name: system-pkgs-debian12
+    image: docker.io/library/debian:12
+    pre_build_image: false
+  - name: system-pkgs-fedora39
+    image: docker.io/library/fedora:39
+    pre_build_image: false
+  - name: system-pkgs-fedora40
+    image: docker.io/library/fedora:40
+    pre_build_image: false
+  - name: system-pkgs-fedora41
+    image: docker.io/library/fedora:41
+    pre_build_image: false
+  - name: system-pkgs-fedora42
+    image: docker.io/library/fedora:42
+    pre_build_image: false
+  - name: system-pkgs-ubuntu2204
+    image: docker.io/library/ubuntu:22.04
+    pre_build_image: false
+  - name: system-pkgs-ubuntu2404
+    image: docker.io/library/ubuntu:24.04
+    pre_build_image: false
+provisioner:
+  name: ansible
+  config_options:
+    defaults:
+      callbacks_enabled: ansible.posix.profile_tasks
+      stdout_callback: ansible.posix.debug
+  playbooks:
+    converge: converge.yml

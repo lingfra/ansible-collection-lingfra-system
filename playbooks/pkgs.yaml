@@ -1,0 +1,12 @@
+---
+# Playbook lingfra.system.pkgs
+
+- name: "Install and remove packages"
+  hosts: "{{ target | default('all') }}"
+  gather_facts: true
+  tags:
+    - pkgs
+  tasks:
+    - name: "Import role lingfra.system.pkgs"
+      ansible.builtin.import_role:
+        name: lingfra.system.pkgs

@@ -1,0 +1,14 @@
+---
+# vars file for pkgs
+
+pkgs_absent: "{{ pkgs_absent__host
+  | ansible.builtin.union(pkgs_absent__global[ansible_distribution ~ ansible_distribution_major_version] | default([]))
+  | ansible.builtin.union(pkgs_absent__global[ansible_distribution] | default([]))
+  | ansible.builtin.union(pkgs_absent__global['all'] | default([]))
+  }}"
+
+pkgs_present: "{{ pkgs_present__host
+  | ansible.builtin.union(pkgs_present__global[ansible_distribution ~ ansible_distribution_major_version] | default([]))
+  | ansible.builtin.union(pkgs_present__global[ansible_distribution] | default([]))
+  | ansible.builtin.union(pkgs_present__global['all'] | default([]))
+  }}"

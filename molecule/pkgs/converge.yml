@@ -1,0 +1,11 @@
+---
+- name: Set playbook variables
+  hosts: all
+  tasks:
+    # Connection to podman container is already root and sudo is not available.
+    - name: Set ansible_become to false
+      ansible.builtin.set_fact:
+        ansible_become: false
+
+- name: Import playbook lingfra.system.pkgs
+  ansible.builtin.import_playbook: lingfra.system.pkgs

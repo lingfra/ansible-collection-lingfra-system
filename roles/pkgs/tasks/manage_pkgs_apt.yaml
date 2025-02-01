@@ -1,0 +1,19 @@
+---
+# tasks file for pkgs
+
+- name: "Update package cache with {{ ansible_pkg_mgr }}"
+  ansible.builtin.apt:
+    update_cache: true
+  become: true
+
+- name: "Install packages with {{ ansible_pkg_mgr }}"
+  ansible.builtin.apt:
+    name: "{{ pkgs_present }}"
+    state: present
+  become: true
+
+- name: "Remove packages with {{ ansible_pkg_mgr }}"
+  ansible.builtin.apt:
+    name: "{{ pkgs_absent }}"
+    state: absent
+  become: true
