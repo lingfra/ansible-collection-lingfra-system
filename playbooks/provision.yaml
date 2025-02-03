@@ -1,0 +1,8 @@
+---
+# Playbook lingfra.system.provision
+
+- name: Import lingfra.system.pkg_manager
+  ansible.builtin.import_playbook: lingfra.system.pkg_manager
+
+- name: Import lingfra.system.pkgs
+  ansible.builtin.import_playbook: lingfra.system.pkgs

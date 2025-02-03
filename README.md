@@ -18,9 +18,14 @@ create VLANs and bridge devives.
 ### Playbooks
 
 - [apt_source](./playbooks/apt_source.yaml)
+- [initial_provision](./playbooks/initial_provision.yaml): Similar to the
+[provision](./playbooks/provision.yaml) playbook this performs basic provisioning tasks, but
+also performs some non-idempotent tasks that are sometimes required on fresh hosts.
 - [pkg_manager](./playbooks/pkg_manager.yaml): Configures the distribution
 specific package manager (currently only pacman is supported).
 - [pkgs](./playbooks/pkgs.yaml)
+- [provision](./playbooks/provision.yaml): Performs basic provisioning tasks on the
+host.
 - [sd_network](./playbooks/sd_network.yaml)
 
 ## Installation

@@ -14,3 +14,11 @@
         - pacman
       when:
         - ansible_pkg_mgr == 'pacman'
+
+    - name: "Include role lingfra.system.apt_source"
+      ansible.builtin.include_role:
+        name: lingfra.system.apt_source
+      tags:
+        - apt_source
+      when:
+        - ansible_pkg_mgr == 'apt'

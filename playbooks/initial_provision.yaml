@@ -1,0 +1,20 @@
+---
+- name: "Initial provision"
+  hosts: "{{ target | default('all') }}"
+  gather_facts: true
+  tags:
+    - initial_provision
+  tasks:
+    - name: "Include role lingfra.system.pacman"
+      ansible.builtin.include_role:
+        name: lingfra.system.pacman
+      tags:
+        - pacman
+      vars:
+        pacman_init_keyring: true
+        pacman_upgrade_system: true
+      when:
+        - ansible_pkg_mgr == 'pacman'
+
+- name: Import playbook lingfra.system.pkgs
+  ansible.builtin.import_playbook: lingfra.system.pkgs
