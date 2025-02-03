@@ -1,0 +1,11 @@
+---
+# meta file for pacman
+
+dependencies: []
+
+galaxy_info:
+  author: lingling
+  description: Configures the pacman package manager and its mirrors.
+  license: The Unlicense
+  min_ansible_version: "2.15"
+  platforms: []

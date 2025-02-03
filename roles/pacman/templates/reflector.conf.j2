@@ -1,0 +1,20 @@
+##############################################################################
+#
+# {{ ansible_managed }}
+#
+# {{ pacman_reflector_conf_path }}
+#
+# Refer to the following resources for more information:
+#
+#  - https://wiki.archlinux.org/title/Reflector
+#  - reflector(1) man page
+#
+# ##############################################################################
+
+--save "{{ pacman_mirrorlist_path }}"
+--protocol https
+--sort rate
+--latest 5
+{% if pacman_reflector_country is defined %}
+--country "{{ pacman_reflector_country | default("") }}"
+{% endif %}

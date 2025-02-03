@@ -1,0 +1,87 @@
+---
+# argument specs file for pacman
+
+argument_specs:
+  main:
+    short_description: "Main entry point for pacman role"
+    description:
+      - "This role configures the pacman package manager."
+      - "It has special handling for setting up an initial system with the options [`pacman_init_keyring`](#pacman_init_keyring) and [`pacman_upgrade_system`](#pacman_upgrade_system). Note that these options are not idempotent and should only be used for initial provisioning."
+      - "The other scope of this role is to maintain the pacman repositories and mirrors."
+      - "You can specify the available repositories in [`pacman_repos`](#pacman_repos)."
+      - "For configuring the main mirror the variable [`pacman_server`](#pacman_server) is available and the `/etc/pacman.d/mirrorlist` can be configured by either [`pacman_mirrorlist`](#pacman_mirrorlist) or [`pacman_reflector`](#pacman_reflector). After configuring a mirrorlist you may want to set [`pacman_server`](#pacman_server) to `''`."
+    author:
+      - "lingling"
+    options:
+      pacman_contrib:
+        type: "bool"
+        default: true
+        description:
+          - "Whether the [pacman-contrib](https://archlinux.org/packages/extra/x86_64/pacman-contrib/) package should be present or not."
+          - "[pacman-contrib](https://gitlab.archlinux.org/pacman/pacman-contrib) provides extra scripts for interacting with pacman."
+      pacman_init_keyring:
+        type: "bool"
+        default: false
+        description:
+          - "Initialize the pacman keyring."
+      pacman_mirrorlist:
+        type: "list"
+        elements: "str"
+        default: []
+        description:
+          - "Custom list of mirrors for pacman."
+          - "Mutually exclusive with [`pacman_reflector`](#pacman_reflector)."
+      pacman_paccache:
+        type: "bool"
+        default: false
+        description:
+          - "Installs paccache and enables the timer for regular pacman cache cleaning."
+          - "Refer to [**paccache(8)**](https://man.archlinux.org/man/paccache.8) for more information."
+          - "Paccache is part of [pacman-contrib](https://archlinux.org/packages/extra/x86_64/pacman-contrib/) and therefore [`pacman_contrib`](#pacman_contrib) need to be `true`."
+      pacman_reflector:
+        type: "bool"
+        default: false
+        description:
+          - "Whether [reflector](https://wiki.archlinux.de/title/Reflector) should be installed and activated or not."
+          - "Refer to [**reflector(1)**](https://man.archlinux.org/man/reflector.1) for more information."
+          - "Mutually exclusive with [`pacman_mirrorlist`](#pacman_mirrorlist)."
+      pacman_reflector_country:
+        type: "str"
+        required: false
+        description:
+          - "The country (or countries) reflector should the mirrors limit to."
+      pacman_repos:
+        type: "list"
+        elements: "str"
+        default:
+          - core
+          - extra
+        choices:
+          - "core"
+          - "core-testing"
+          - "extra"
+          - "extra-testing"
+          - "gnome-unstable"
+          - "kde-unstable"
+          - "multilib"
+          - "multilib-testing"
+          - "testing"
+        description:
+          - "List of official Arch Linux repositories to be enabled."
+      pacman_server:
+        type: "str"
+        default: "https://mirror.rackspace.com/archlinux/$repo/os/$arch"
+        description:
+          - "The main mirror server for the official Arch Linux repositories."
+          - "Will have precedence over the mirrors specified in `/etc/pacman.d/mirrorlist`."
+          - "The default of this variable should be a worldwide available pacman mirror as returned by [Pacman Mirrorlist Generator](https://archlinux.org/mirrorlist/)."
+          - "If this mirror deprecated some day, please open an issue."
+          - "This variable has a default primary for bootstraping reasons."
+          - "If you do not want specify a main server for official pacman repositories set this variable to an empty string."
+      pacman_upgrade_system:
+        type: "bool"
+        default: false
+        description:
+          - "Whether or a full system upgrade should be done."
+          - "This is a non-idempotent action and therefore only recommended for the first provisioning."
+          - "In the case of first provisioning this should be used together with `pacman_init=true`."

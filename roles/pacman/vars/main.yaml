@@ -1,0 +1,6 @@
+---
+# vars file for pacman
+
+pacman_conf_path: /etc/pacman.conf
+pacman_mirrorlist_path: /etc/pacman.d/mirrorlist
+pacman_reflector_conf_path: /etc/xdg/reflector/reflector.conf

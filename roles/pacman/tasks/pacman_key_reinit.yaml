@@ -1,0 +1,12 @@
+---
+# tasks file for pacman
+
+- name: Remove /etc/pacman.d/gnupg
+  ansible.builtin.file:
+    path: /etc/pacman.d/gnupg
+    state: absent
+  become: true
+
+- name: "Import tasks pacman_key_init"
+  ansible.builtin.import_tasks:
+    file: pacman_key_init.yaml

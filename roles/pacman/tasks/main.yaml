@@ -1,0 +1,143 @@
+---
+# tasks file for role pacman
+
+# ---------- Checks ----------
+
+- name: "Check pacman mirror and reflector configuration"
+  ansible.builtin.assert:
+    that:
+      - not (pacman_reflector and pacman_mirrorlist | length > 0)
+    fail_msg: >
+      The options `pacman_mirrorlist` and `pacman_reflector` are mutually
+      exclusive!
+    quiet: true
+  tags:
+    - checks
+    - pacman
+
+- name: "Check that at least one mirror is configured"
+  ansible.builtin.assert:
+    that:
+      - >
+        (pacman_server | length > 0)
+        or pacman_reflector
+        or ((pacman_mirrorlist is defined) and (pacman_mirrorlist | length > 0))
+    fail_msg: >
+      It is required that at least one mirror for pacman is configured! Set
+      either pacman_server, pacman_reflector or pacman_mirrorlist. Refer to the
+      role documentation for more information.
+    quiet: true
+  tags:
+    - checks
+    - pacman
+
+- name: "Check that pacman-contrib is present for paccache should be enabled"
+  ansible.builtin.assert:
+    that:
+      - not pacman_paccache or pacman_contrib
+    fail_msg: >
+      Paccache is part of the pacman-contrib package. Therefore you need to
+      enable pacman_contrib too if you want to use paccache.
+    quiet: true
+  tags:
+    - checks
+    - pacman
+
+# ---------- Configuration ----------
+
+- name: Template {{ pacman_conf_path }}
+  ansible.builtin.template:
+    src: pacman.conf.j2
+    dest: "{{ pacman_conf_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+  tags:
+    - configure
+    - pacman
+
+- name: Template {{ pacman_mirrorlist_path }}
+  ansible.builtin.template:
+    src: mirrorlist.j2
+    dest: "{{ pacman_mirrorlist_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+  tags:
+    - configure
+    - pacman
+  when:
+    - pacman_mirrorlist is defined
+    - not pacman_reflector
+
+- name: Update the package cache
+  community.general.pacman:
+    update_cache: true
+  become: true
+  tags:
+    - configure
+    - pacman
+
+- name: Initialize pacman keyring
+  when:
+    - pacman_init_keyring
+  tags:
+    - configure
+    - pacman
+
+  block:
+    - name: Include pacman_key_init.yaml
+      ansible.builtin.include_tasks:
+        file: pacman_key_init.yaml
+        apply:
+          tags:
+            - configure
+            - pacman
+
+  rescue:
+    - name: Include pacman_key_reinit.yaml
+      ansible.builtin.include_tasks:
+        file: pacman_key_reinit.yaml
+        apply:
+          tags:
+            - configure
+            - pacman
+
+- name: "Import tasks reflector.yaml"
+  ansible.builtin.import_tasks:
+    file: reflector.yaml
+  tags:
+    - configure
+    - pacman
+    - reflector
+
+- name: Full system upgrade
+  community.general.pacman:
+    upgrade: true
+  become: true
+  tags:
+    - configure
+    - pacman
+  when:
+    - pacman_upgrade_system
+
+- name: Manage pacman-contrib package
+  community.general.pacman:
+    name:
+      - pacman-contrib
+    state: "{{ 'present' if pacman_contrib else 'absent' }}"
+  become: true
+  tags:
+    - configure
+    - pacman
+
+- name: Manage paccache.timer
+  ansible.builtin.systemd:
+    name: paccache.timer
+    state: "{{ 'started' if pacman_paccache else 'stopped' }}"
+    enabled: "{{ true if pacman_paccache else false }}"
+  become: true
+  when:
+    - pacman_contrib

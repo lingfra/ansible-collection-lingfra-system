@@ -1,0 +1,29 @@
+# ##############################################################################
+#
+# {{ ansible_managed }}
+#
+# {{ pacman_conf_path }}
+#
+# See the pacman.conf(5) manpage for option and repository directives
+#
+# ##############################################################################
+
+[options]
+Architecture      = auto
+CheckSpace
+Color
+DownloadUser      = alpm
+ILoveCandy
+ParallelDownloads = 5
+SigLevel          = Required DatabaseOptional
+LocalFileSigLevel = Optional
+{% for repo in pacman_repos %}
+
+[{{ repo }}]
+{% if pacman_server | default(false) %}
+Server = {{ pacman_server }}
+{% endif %}
+{% if pacman_mirrorlist | default(false) or pacman_reflector %}
+Include = /etc/pacman.d/mirrorlist
+{% endif %}
+{% endfor %}

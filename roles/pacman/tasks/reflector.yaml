@@ -1,0 +1,47 @@
+---
+# tasks file for pacman
+
+- name: Install reflector
+  community.general.pacman:
+    name: reflector
+    state: present
+  become: true
+  when:
+    - pacman_reflector
+
+- name: Template {{ pacman_reflector_conf_path }}
+  ansible.builtin.template:
+    src: reflector.conf.j2
+    dest: "{{ pacman_reflector_conf_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+  tags:
+    - configure
+    - pacman
+    - reflector
+  when:
+    - pacman_reflector
+
+- name: Populate service facts
+  ansible.builtin.service_facts:
+  when:
+    - pacman_reflector
+
+- name: Manage reflector.timer unit
+  ansible.builtin.systemd:
+    name: reflector.timer
+    state: "{{ 'started' if pacman_reflector else 'stopped' }}"
+    enabled: "{{ true if pacman_reflector else false }}"
+  become: true
+  when:
+    - ansible_facts['services']['reflector.service'] is defined
+
+- name: Populate mirrorlist with reflector
+  ansible.builtin.systemd:
+    name: reflector.service
+    state: started
+  when:
+    - pacman_upgrade_system
+    - pacman_reflector

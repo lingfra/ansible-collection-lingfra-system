@@ -1,0 +1,21 @@
+---
+# tasks file for pacman_config
+
+- name: Init pacman keyring
+  ansible.builtin.command:
+    cmd: pacman-key --init
+  become: true
+  changed_when: true
+
+- name: Populare pacman archlinux keyring
+  ansible.builtin.command:
+    cmd: pacman-key archlinux --populate
+  become: true
+  changed_when: true
+
+- name: Update pacman cache and install archlinux-keyring
+  community.general.pacman:
+    name: archlinux-keyring
+    state: latest
+    update_cache: true
+  become: true
