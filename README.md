@@ -21,6 +21,11 @@ create VLANs and bridge devives.
 - [initial_provision](./playbooks/initial_provision.yaml): Similar to the
 [provision](./playbooks/provision.yaml) playbook this performs basic provisioning tasks, but
 also performs some non-idempotent tasks that are sometimes required on fresh hosts.
+- [pacman_key_reinit](./playbooks/pacman_key_reinit.yaml): This playbook
+re-initializes the pacman trust database by deleting, re-initializing and
+populating it. This is a shortcut to a task file from the
+[pacman](./roles/pacman/README.md) role (in particular
+[pacman_key_reinit.yaml](./roles/pacman/tasks/pacman_key_reinit.yaml)).
 - [pkg_manager](./playbooks/pkg_manager.yaml): Configures the distribution
 specific package manager (currently only pacman is supported).
 - [pkgs](./playbooks/pkgs.yaml)

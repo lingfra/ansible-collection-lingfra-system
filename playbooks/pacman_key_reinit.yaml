@@ -1,0 +1,17 @@
+---
+# Playbook lingfra.system.pacman_key_reinit
+
+- name: "Re-initialize Pacman trust database"
+  hosts: "{{ target }}"
+  gather_facts: true
+  tags:
+    - pacman
+  tasks:
+    - name: "Import role pacman"
+      ansible.builtin.import_role:
+        name: pacman
+        tasks_from: pacman_key_reinit.yaml
+      tags:
+        - pacman
+      when:
+        - ansible_pkg_mgr == 'pacman'
