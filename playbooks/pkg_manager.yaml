@@ -1,0 +1,16 @@
+---
+# Playbook lingfra.system.pkg_manager
+
+- name: "Configure package managers"
+  hosts: "{{ target | default('all') }}"
+  gather_facts: true
+  tags:
+    - pkg_manager
+  tasks:
+    - name: "Include role lingfra.system.pacman"
+      ansible.builtin.include_role:
+        name: lingfra.system.pacman
+      tags:
+        - pacman
+      when:
+        - ansible_pkg_mgr == 'pacman'

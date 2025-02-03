@@ -18,6 +18,8 @@ create VLANs and bridge devives.
 ### Playbooks
 
 - [apt_source](./playbooks/apt_source.yaml)
+- [pkg_manager](./playbooks/pkg_manager.yaml): Configures the distribution
+specific package manager (currently only pacman is supported).
 - [pkgs](./playbooks/pkgs.yaml)
 - [sd_network](./playbooks/sd_network.yaml)
 
