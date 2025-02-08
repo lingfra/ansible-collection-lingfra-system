@@ -1,0 +1,10 @@
+---
+- name: "Configure the initial initramfs with mkinitcpio"
+  hosts: "{{ target | default('all') }}"
+  gather_facts: true
+  tags:
+    - mkinitcpio
+  tasks:
+    - name: "Import role lingfra.system.mkinitcpio"
+      ansible.builtin.import_role:
+        name: lingfra.system.mkinitcpio
