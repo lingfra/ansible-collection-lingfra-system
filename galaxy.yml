@@ -14,3 +14,10 @@ tags:
   - infrastructure
   - linux
 dependencies: {}
+build_ignore:
+  - '*.tar.gz'
+  - .aar_doc
+  - .aar_doc.yml
+  - .git
+  - .gitignore
+  - .gitmodules
