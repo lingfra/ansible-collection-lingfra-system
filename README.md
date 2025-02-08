@@ -11,6 +11,8 @@ functions.
 systems.
 - [mkinitcpio](./roles/mkinitcpio/README.md): Configures mkinitcpio and builds
 the initramfs.
+- [mkinitcpio_sd_tool](./roles/mkinitcpio_sd_tool/README.md): Installs and
+configures mkinitcpio-systemd-tool for remote root device decryption over SSH.
 - [pacman](./roles/pacman/README.md): Configures the Pacman package manager and
 its mirrors.
 - [pkgs](./roles/pkgs/README.md): Install and remove system packages.

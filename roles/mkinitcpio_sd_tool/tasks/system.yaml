@@ -1,0 +1,24 @@
+---
+# tasks file for mkinitcpio_sd_tool
+
+- name: "Install dependencies for mkinitcpio-systemd-tool"
+  community.general.pacman:
+    name: "{{ mkinitcpio_sd_tool_packages }}"
+    update_cache: true
+  become: true
+  tags:
+    - configure
+    - mkinitcpio_sd_tool
+
+- name: "Enable required units for mkinitcpio-systemd-tool with systemd module"
+  ansible.builtin.systemd:
+    name: "{{ unit }}"
+    enabled: true
+  become: true
+  loop: "{{ mkinitcpio_sd_tool_units }}"
+  loop_control:
+    loop_var: unit
+  register: mkinitcpio_sd_tool_systemd_result
+  tags:
+    - configure
+    - mkinitcpio_sd_tool

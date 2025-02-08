@@ -1,0 +1,20 @@
+---
+# vars file for mkinitcpio_sd_tool
+
+mkinitcpio_sd_tool_authorized_keys_path: /etc/mkinitcpio-systemd-tool/config/authorized_keys
+mkinitcpio_sd_tool_crypttab_path: /etc/mkinitcpio-systemd-tool/config/crypttab
+mkinitcpio_sd_tool_fstab_path: /etc/mkinitcpio-systemd-tool/config/fstab
+mkinitcpio_sd_tool_packages:
+  - busybox
+  - cryptsetup
+  - less
+  - mc
+  - mkinitcpio-systemd-tool
+  - openssh
+  - tinyssh
+  - tinyssh-convert
+mkinitcpio_sd_tool_units:
+  - initrd-cryptsetup.path
+  - initrd-tinysshd.service
+  - initrd-debug-progs.service
+  - initrd-sysroot-mount.service

@@ -1,0 +1,109 @@
+---
+# tasks file for mkinitcpio_sd_tool
+
+# ---------- Checks ----------
+
+- name: "Validate internal role variables"
+  ansible.builtin.validate_argument_spec:
+    argument_spec: "{{ (lookup('ansible.builtin.file', 'meta/argument_specs.yaml')
+        | from_yaml)['argument_specs']['internal']['options'] }}"
+  tags:
+    - checks
+    - mkinitcpio_sd_tool
+
+# ---------- Configure ----------
+
+- name: "Include tasks for system environment"
+  ansible.builtin.include_tasks:
+    file: system.yaml
+  when: >
+    (mkinitcpio_sd_tool_chroot_dir is not defined) or
+    (mkinitcpio_sd_tool_chroot_dir | length == 0)
+
+- name: "Include tasks for chrooted environment"
+  ansible.builtin.include_tasks:
+    file: chroot.yaml
+  when:
+    - mkinitcpio_sd_tool_chroot_dir is defined
+    - mkinitcpio_sd_tool_chroot_dir | length > 0
+
+- name: "Add sysroot entry to crypttab of mkinitcpio-systemd-tool"
+  community.general.crypttab:
+    name: "{{ entry.name }}"
+    backing_device: "UUID={{ entry.uuid }}"
+    password: "{{ entry.password | default('none') }}"
+    opts: "{{ entry.options | default('luks') }}"
+    state: present
+    path: "{{ mkinitcpio_sd_tool_crypttab_path | lingfra.system.path_under_chroot(mkinitcpio_sd_tool_chroot_dir | default(none)) }}"
+  become: true
+  register: mkinitcpio_sd_tool_crypttab_result
+  loop: "{{ mkinitcpio_sd_tool_crypttab_entries }}"
+  loop_control:
+    loop_var: entry
+    label: "{{ entry.name ~ ' ' ~ entry.device | default('N/A') }}"
+  tags:
+    - configure
+    - mkinitcpio_sd_tool
+
+- name: "Add sysroot entry to fstab of mkinitcpio-systemd-tool"
+  ansible.builtin.template:
+    src: fstab.j2
+    dest: "{{ mkinitcpio_sd_tool_fstab_path | lingfra.system.path_under_chroot(mkinitcpio_sd_tool_chroot_dir | default(none)) }}"
+    owner: root
+    group: root
+    mode: "0400"
+  become: true
+  register: mkinitcpio_sd_tool_fstab_result
+  tags:
+    - configure
+    - mkinitcpio_sd_tool
+
+- name: "Add authorized key for tinysshd in initramfs for mkinitcpio-systemd-tool"
+  ansible.posix.authorized_key:
+    exclusive: true
+    key: "{{ mkinitcpio_sd_tool_ssh_pub_key }}"
+    manage_dir: false
+    path: "{{ mkinitcpio_sd_tool_authorized_keys_path | lingfra.system.path_under_chroot(mkinitcpio_sd_tool_chroot_dir | default(none)) }}"
+    state: present
+    user: root
+  become: true
+  register: mkinitcpio_sd_tool_authorized_key_result
+  tags:
+    - configure
+    - mkinitcpio_sd_tool
+
+# ---------- Return Value ----------
+
+- name: "Set fact mkinitcpio_sd_tool_changed"
+  ansible.builtin.set_fact:
+    mkinitcpio_sd_tool_changed: true
+  loop:
+    - label: authorized_key_result
+      result: "{{ mkinitcpio_sd_tool_authorized_key_result }}"
+    - label: crypttab_result
+      result: "{{ mkinitcpio_sd_tool_crypttab_result }}"
+    - label: fstab_result
+      result: "{{ mkinitcpio_sd_tool_fstab_result }}"
+    - label: systemd_result
+      result: "{{ mkinitcpio_sd_tool_systemd_result }}"
+  loop_control:
+    loop_var: task
+    label: "{{ task.label }}"
+  when:
+    - task.result.changed
+  tags:
+    - mkinitcpio_sd_tool
+    - return
+
+# ---------- Clean-Up ----------
+
+- name: "Nullify runtime variables of mkinitcpio_sd_tool"
+  ansible.builtin.set_fact:
+    mkinitcpio_sd_tool_authorized_key_result: null
+    mkinitcpio_sd_tool_crypttab_result: null
+    mkinitcpio_sd_tool_fstab_result: null
+    mkinitcpio_sd_tool_systemd_chroot_result: null
+    mkinitcpio_sd_tool_systemd_result: null
+  tags:
+    - clean-up
+    - mkinitcpio_sd_tool
