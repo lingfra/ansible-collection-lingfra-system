@@ -1,0 +1,96 @@
+---
+- name: "Set facts for image building"
+  hosts: "{{ target_build_image_host | default('localhost') }}"
+  gather_facts: false
+  tags:
+    - always
+  vars_prompt:
+    - name: image_hostname
+      private: false
+      prompt: "Name of the new host"
+  tasks:
+    - name: "Set facts for image building"
+      ansible.builtin.set_fact:
+        build_image_chroot_path: /target
+        build_image_device: /dev/nbd7
+        build_image_hostname: "{{ image_hostname }}"
+        build_image_name: /tmp/{{ image_hostname }}.qcow2
+
+- name: "Prepare building host"
+  hosts: "{{ target_build_image_host | default('localhost') }}"
+  gather_facts: true
+  tags:
+    - qemu_init
+  tasks:
+    - name: Dynamically load nbd kernel module
+      community.general.modprobe:
+        name: nbd
+        state: present
+        persistent: disabled
+      become: true
+
+    - name: Create qcow2 image
+      ansible.builtin.command:
+        cmd: qemu-img create -f qcow2 {{ build_image_name }} 20G
+        creates: "{{ build_image_name }}"
+      become: true
+
+    - name: Connect to qcow2 image
+      ansible.builtin.command:
+        cmd: qemu-nbd --connect={{ build_image_device }} {{ build_image_name }}
+      become: true
+      changed_when: true
+      when:
+        - (ansible_devices[build_image_device | ansible.builtin.split('/') | last]['sectors'] | default(0)) == 0
+
+- name: "Bootstrap Arch Linux"
+  hosts: "{{ target_build_image_host | default('localhost') }}"
+  gather_facts: true
+  tags:
+    - bootstrap_arch_linux
+  tasks:
+    - name: "Import role lingfra.system.bootstrap_arch_linux"
+      ansible.builtin.import_role:
+        name: lingfra.system.bootstrap_arch_linux
+      vars:
+        bootstrap_arch_linux_chroot_path: "{{ build_image_chroot_path }}"
+        bootstrap_arch_linux_device: "{{ build_image_device }}"
+        bootstrap_arch_linux_hostname: "{{ build_image_hostname }}"
+        bootstrap_arch_linux_root_authorized_ssh_key: "{{ global_ssh_pub_key }}"
+        bootstrap_arch_linux_system_type: bios
+
+- name: "Detach Image and unload kernel module"
+  hosts: "{{ target_build_image_host | default('localhost') }}"
+  gather_facts: true
+  tags:
+    - detach
+  tasks:
+    - name: Recursively unmount
+      ansible.builtin.command:
+        argv:
+          - umount
+          - -R
+          - "{{ build_image_chroot_path }}"
+      become: true
+      changed_when: true
+
+    - name: Deactivate volume group
+      community.general.lvg:
+        state: inactive
+        vg: vg0
+      become: true
+
+    - name: Disconnect qemu-nbd device
+      ansible.builtin.command:
+        argv:
+          - qemu-nbd
+          - --disconnect
+          - "{{ build_image_device }}"
+      become: true
+      changed_when: true
+
+    - name: Unload nbd kernel module
+      community.general.modprobe:
+        name: nbd
+        state: absent
+      become: true
