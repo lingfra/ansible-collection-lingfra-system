@@ -1,0 +1,22 @@
+---
+# tasks file for partitions
+
+- name: "Make swap on {{ volume.dev }}"
+  ansible.builtin.command:
+    argv:
+      - mkswap
+      - "{{ volume.dev }}"
+  become: true
+  changed_when: true
+  ignore_errors: true
+
+- name: "Activate swap on {{ volume.dev }}"
+  ansible.builtin.command:
+    argv:
+      - swapon
+      - "{{ volume.dev }}"
+  become: true
+  changed_when: true
+  ignore_errors: true
+  when:
+    - partitions_activate_swap

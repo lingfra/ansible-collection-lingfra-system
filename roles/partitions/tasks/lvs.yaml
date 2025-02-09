@@ -1,0 +1,27 @@
+---
+# tasks file for partitions
+
+- name: "Create logical volume {{ volume.name }}"
+  community.general.lvol:
+    vg: "{{ volume.vg }}"
+    lv: "{{ volume.lv }}"
+    size: "{{ volume.size }}"
+    shrink: false
+  become: true
+
+- name: "Format filesystem of {{ volume.name }}"
+  community.general.filesystem:
+    fstype: "{{ volume.fs_type }}"
+    dev: "{{ volume.dev }}"
+    opts: "{{ volume.fs_opts | default(omit) }}"
+  become: true
+
+- name: "Mount logical volume {{ volume.name }}"
+  ansible.posix.mount:
+    path: "{{ volume.mount_path }}"
+    src: "{{ volume.dev }}"
+    fstype: "{{ volume.fs_type }}"
+    state: ephemeral
+  become: true
+  when:
+    - volume.fs_type != 'swap'
