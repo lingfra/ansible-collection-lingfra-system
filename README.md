@@ -15,6 +15,7 @@ the initramfs.
 configures mkinitcpio-systemd-tool for remote root device decryption over SSH.
 - [pacman](./roles/pacman/README.md): Configures the Pacman package manager and
 its mirrors.
+- [partitions](./roles/partitions/README.md): Configures partitions for a device.
 - [pkgs](./roles/pkgs/README.md): Install and remove system packages.
 - [sd_network](./roles/sd_network/README.md): Configure systemd-network to
 create VLANs and bridge devives.
@@ -31,6 +32,7 @@ re-initializes the pacman trust database by deleting, re-initializing and
 populating it. This is a shortcut to a task file from the
 [pacman](./roles/pacman/README.md) role (in particular
 [pacman_key_reinit.yaml](./roles/pacman/tasks/pacman_key_reinit.yaml)).
+- [partitions](./playbooks/partitions.yaml)
 - [pkg_manager](./playbooks/pkg_manager.yaml): Configures the distribution
 specific package manager (currently only pacman is supported).
 - [pkgs](./playbooks/pkgs.yaml)

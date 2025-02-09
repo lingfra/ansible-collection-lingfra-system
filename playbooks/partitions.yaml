@@ -1,0 +1,10 @@
+---
+- name: "Configure partitions"
+  hosts: "{{ target | default('all') }}"
+  gather_facts: true
+  tags:
+    - partitions
+  tasks:
+    - name: "Import role lingfra.system.partitions"
+      ansible.builtin.import_role:
+        name: lingfra.system.partitions
