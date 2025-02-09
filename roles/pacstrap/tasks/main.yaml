@@ -1,0 +1,58 @@
+---
+# tasks file for pacstrap
+
+- name: "Stat {{ pacstrap_chroot_path }}"
+  ansible.builtin.stat:
+    path: "{{ pacstrap_chroot_path }}"
+  become: true
+  register: st_pacstrap_chroot_path
+  tags:
+    - checks
+
+- name: "Check target folder"
+  ansible.builtin.assert:
+    that:
+      - pacstrap_chroot_path | length > 0
+      - pacstrap_chroot_path[0] == "/"
+      - st_pacstrap_chroot_path.stat.exists
+      - st_pacstrap_chroot_path.stat.isdir
+      - st_pacstrap_chroot_path.stat.writeable
+      # The following check would be useful, but it fails on the first run.
+      # I think it is because the mount facts are not updated.
+      # - pacstrap_chroot_path in mounted_folders
+    fail_msg: Check failed.
+    success_msg: All assertions passed.
+    quiet: true
+  tags:
+    - checks
+    - pacstrap
+  vars:
+    mounted_folders: "{{ ansible_facts['mounts'] | selectattr('mount', 'defined') | map(attribute='mount') }}"
+
+- name: "Stat test file"
+  ansible.builtin.stat:
+    path: "{{ pacstrap_test_file | lingfra.system.chrooted_path(pacstrap_chroot_path) }}"
+  become: true
+  register: st_pacstrap_test_file
+  tags:
+    - configure
+    - genfstab
+    - pacstrap
+
+- name: "Run pacstrap"
+  ansible.builtin.command:
+    argv: "{{ pacstrap_command_argv + pacstrap_packages }}"
+  become: true
+  changed_when: true
+  tags:
+    - configure
+    - pacstrap
+  when:
+    - not st_pacstrap_test_file.stat.exists
+
+# ---------- Clean-Up ----------
+
+- name: "Nullify runtime variables for pacstrap"
+  ansible.builtin.set_fact:
+    st_pacstrap_chroot_path: null
+    st_pacstrap_test_file: null

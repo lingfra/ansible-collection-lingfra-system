@@ -1,0 +1,9 @@
+---
+# vars file for pacstrap
+
+pacstrap_command_argv:
+  - "pacstrap"
+  - "{{ pacstrap_chroot_path }}"
+  - "base"
+  - "linux"
+pacstrap_test_file: /usr/bin/pacman
