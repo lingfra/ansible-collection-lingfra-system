@@ -1,0 +1,33 @@
+# ##############################################################################
+#
+# {{ ansible_managed }}
+#
+# {{ grub_defaults_path }}
+#
+# See the following upstream documentation for more information:
+#
+#   https://www.gnu.org/software/grub/manual/grub/html_node/Simple-configuration.html
+#
+# ##############################################################################
+
+GRUB_CMDLINE_LINUX_DEFAULT="{{ grub_conf_cmdline_linux_default | join(' ') }}"
+GRUB_CMDLINE_LINUX="{{ grub_conf_cmdline_linux | join(' ') }}"
+GRUB_DEFAULT={{ grub_conf_default }}
+GRUB_DISABLE_OS_PROBER={{ grub_conf_disable_os_prober | ternary('true', 'false') }}
+GRUB_DISABLE_RECOVERY={{ grub_conf_disable_recovery | ternary('true', 'false') }}
+GRUB_DISTRIBUTOR={{ grub_conf_distributor }}
+GRUB_GFXMODE={{ grub_conf_gfxmode }}
+GRUB_GFXPAYLOAD_LINUX={{ grub_conf_gfxpayload_linux }}
+GRUB_PRELOAD_MODULES="{{ grub_conf_preload_modules | join(' ') }}"
+GRUB_SAVEDEFAULT={{ grub_conf_savedefault | ternary('true', 'false') }}
+GRUB_TERMINAL_INPUT={{ grub_conf_terminal_input }}
+GRUB_TERMINAL_OUTPUT={{ grub_conf_terminal_output }}
+GRUB_TIMEOUT={{ grub_conf_timeout }}
+GRUB_TIMEOUT_STYLE={{ grub_conf_timeout_style }}
+{% if (grub_conf_extra_options is defined) %}
+
+# extra options
+{% for k, v in grub_conf_extra_options.items() %}
+{{ k }}={{ v }}
+{% endfor %}
+{% endif %}

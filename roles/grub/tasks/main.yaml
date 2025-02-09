@@ -1,0 +1,57 @@
+---
+# tasks file for grub
+
+- name: "Template {{ grub_defaults_path }}"
+  ansible.builtin.template:
+    src: grub.j2
+    dest: "{{ grub_defaults_path | lingfra.system.chrooted_path(grub_chroot_path | default(null)) }}"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  become: true
+  diff: true
+  tags:
+    - configure
+    - grub
+
+- name: "Compose grub install command for BIOS"
+  ansible.builtin.set_fact:
+    grub_install_command_argv: "{{ grub_install_command_argv
+        + [grub_install_path] }}"
+  tags:
+    - configure
+    - grub
+  when:
+    - grub_install_target == "i386-pc"
+
+- name: "Compose grub install command for UEFI"
+  ansible.builtin.set_fact:
+    grub_install_command_argv: "{{ grub_install_command_argv
+        + ['--efi-directory=' ~ grub_install_path, '--bootloader-id=GRUB'] }}"
+  tags:
+    - configure
+    - grub
+  when:
+    - grub_install_target == "x86_64-efi"
+
+- name: "Install grub"
+  ansible.builtin.command:
+    argv: "{{ grub_install_command_argv
+      | lingfra.system.arch_chroot_argv(grub_chroot_path | default(null)) }}"
+  become: true
+  changed_when: true
+  tags:
+    - configure
+    - grub
+    - grub-install
+
+- name: "Generate grub config"
+  ansible.builtin.command:
+    argv: "{{ grub_gen_config_command_argv
+      | lingfra.system.arch_chroot_argv(grub_chroot_path | default(null)) }}"
+  become: true
+  changed_when: true
+  tags:
+    - configure
+    - grub
+    - grub-mkconfig

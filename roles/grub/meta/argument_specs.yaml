@@ -1,0 +1,113 @@
+---
+# argument specs file for grub
+
+argument_specs:
+  main:
+    short_description: "Main entry point for grub role"
+    description:
+      - "This role templates the GRUB configuration file and generates the boot config."
+      - ""
+      - "Refer to the [grub upstream documentation](https://www.gnu.org/software/grub/manual/grub/html_node/Simple-configuration.html) for more information about the `grub_conf_*` variables."
+      - "Another useful resource for GRUB configuration is [GRUB (ArchWiki)](https://wiki.archlinux.org/title/GRUB)."
+    author:
+      - "lingling"
+    options:
+      grub_chroot_path:
+        type: "str"
+        required: false
+        description:
+          - "If this variable is specified, the GRUB configuration file will be templated inside the chroot, aswell as the bootloader builded."
+      grub_conf_cmdline_linux_default:
+        type: "list"
+        elements: "str"
+        default: []
+      grub_conf_cmdline_linux:
+        type: "list"
+        elements: "str"
+        default: []
+      grub_conf_default:
+        type: "str"
+        default: "0"
+      grub_conf_disable_os_prober:
+        type: "bool"
+        default: true
+      grub_conf_disable_recovery:
+        type: "bool"
+        default: false
+      grub_conf_distributor:
+        type: "str"
+        default: "Arch"
+      grub_conf_extra_options:
+        type: "dict"
+        required: false
+        description:
+          - "GRUB has many configuration options and supporting them would be to much work."
+          - "This variable can be used to specify the options as key/value pairs."
+      grub_conf_gfxmode:
+        type: "str"
+        default: "auto"
+      grub_conf_gfxpayload_linux:
+        type: "str"
+        default: "keep"
+      grub_conf_preload_modules:
+        type: "list"
+        elements: "str"
+        default:
+          - "part_gpt"
+          - "part_msdos"
+      grub_conf_savedefault:
+        type: "bool"
+        default: false
+      grub_conf_terminal_input:
+        type: "str"
+        default: "console"
+      grub_conf_terminal_output:
+        type: "str"
+        default: "console"
+      grub_conf_timeout:
+        type: "int"
+        default: 5
+      grub_conf_timeout_style:
+        type: "str"
+        default: "menu"
+        choices:
+          - "countdown"
+          - "hidden"
+          - "menu"
+      grub_defaults_path:
+        type: "str"
+        default: "/etc/default/grub"
+        description:
+          - "Path to the GRUB configuration file."
+      grub_mkconfig_output_path:
+        type: "str"
+        default: /boot/grub/grub.cfg
+        description:
+          - "Specifies output path for the generation of the GRUB configuration file."
+      grub_install_target:
+        type: "str"
+        required: true
+        choices:
+          - "i386-efi"
+          - "i386-pc"
+          - "x86_64-efi"
+        description:
+          - "The target architecture of your computer."
+          - ""
+          - "- `i386-efi` for UEFI (32 bit)"
+          - "- `i386-pc` for BIOS"
+          - "- `x86_64-efi` for UEFI (64 bit)"
+      grub_install_path:
+        type: "str"
+        required: true
+        description:
+          - "The path where GRUB should be installed."
+          - ""
+          - "For BIOS systems this is the block device."
+          - "And for UEFI systems this is the EFI directory."
+      grub_install_extra_args:
+        type: "list"
+        elements: "str"
+        required: false
+        description:
+          - "Extra arguments for the installation of GRUB."

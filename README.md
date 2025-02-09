@@ -9,6 +9,7 @@ functions.
 
 - [apt_source](./roles/apt_source/README.md): Configure APT sources on Deb-based
 systems.
+- [grub](./roles/grub/README.md): Configures GRUB and generates its config.
 - [mkinitcpio](./roles/mkinitcpio/README.md): Configures mkinitcpio and builds
 the initramfs.
 - [mkinitcpio_sd_tool](./roles/mkinitcpio_sd_tool/README.md): Installs and

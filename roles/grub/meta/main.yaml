@@ -1,0 +1,11 @@
+---
+# meta file for grub
+
+dependencies: []
+
+galaxy_info:
+  author: lingling
+  description: Configures GRUB and generates its config.
+  license: The Unlicense
+  min_ansible_version: "2.15"
+  platforms: []

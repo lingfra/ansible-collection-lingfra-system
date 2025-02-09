@@ -1,0 +1,11 @@
+---
+# vars file for grub
+
+grub_defaults_path: /etc/default/grub
+grub_install_command_argv:
+  - "grub-install"
+  - "{{ '--target=' ~ grub_install_target }}"
+grub_gen_config_command_argv:
+  - "grub-mkconfig"
+  - "-o"
+  - "{{ grub_mkconfig_output_path }}"
