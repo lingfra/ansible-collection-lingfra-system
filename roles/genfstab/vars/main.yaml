@@ -1,0 +1,7 @@
+---
+# vars file for genfstab
+
+genfstab_command_argv:
+  - "genfstab"
+  - "-U"
+  - "{{ genfstab_chroot_path }}"
