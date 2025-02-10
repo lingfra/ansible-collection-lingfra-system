@@ -1,0 +1,4 @@
+---
+# vars file for vconsole
+
+vconsole_conf_path: /etc/vconsole.conf

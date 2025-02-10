@@ -1,0 +1,8 @@
+# {{ ansible_managed }}
+#
+# {{ vconsole_conf_path }}
+
+KEYMAP={{ vconsole_conf_keymap }}
+{% if (vconsole_conf_font is defined) and (vconsole_conf_font is not none) %}
+FONT={{ vconsole_conf_font }}
+{% endif %}

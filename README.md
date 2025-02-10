@@ -19,6 +19,7 @@ its mirrors.
 - [pacstrap](./roles/pacstrap/README.md): Runs pacstrap on a target folder.
 - [partitions](./roles/partitions/README.md): Configures partitions for a device.
 - [pkgs](./roles/pkgs/README.md): Install and remove system packages.
+- [vconsole](./roles/vconsole/README.md): Templates vconsole.conf.
 - [sd_network](./roles/sd_network/README.md): Configure systemd-network to
 create VLANs and bridge devives.
 
