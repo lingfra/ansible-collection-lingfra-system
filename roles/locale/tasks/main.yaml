@@ -1,0 +1,22 @@
+---
+# tasks file for locale
+
+- name: "Template {{ locale_gen_path }}"
+  ansible.builtin.template:
+    src: locale.gen.j2
+    dest: "{{ locale_gen_path | lingfra.system.chrooted_path(locale_chroot_path | default(null)) }}"
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+  notify:
+    - "Generate locales"
+
+- name: "Template {{ locale_conf_path }}"
+  ansible.builtin.template:
+    src: locale.conf.j2
+    dest: "{{ locale_conf_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  become: true

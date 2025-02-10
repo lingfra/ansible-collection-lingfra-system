@@ -1,0 +1,21 @@
+# ##############################################################################
+#
+# {{ ansible_managed }}
+#
+# {{ locale_conf_path }}
+#
+# See the following resources for more information:
+#
+#   - locale(7)
+#   - https://wiki.archlinux.org/title/Locale#Variables
+#
+# ##############################################################################
+
+LANG={{ locale_conf_lang }}
+{% if (locale_conf_extra_options is defined) and (locale_conf_extra_options.keys() | length > 0) %}
+# extra options
+
+{% for k, v in locale_conf_extra_options.items() %}
+{{ k }}={{ v }}
+{% endfor %}
+{% endif %}
