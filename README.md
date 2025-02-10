@@ -22,6 +22,7 @@ its mirrors.
 - [vconsole](./roles/vconsole/README.md): Templates vconsole.conf.
 - [sd_network](./roles/sd_network/README.md): Configure systemd-network to
 create VLANs and bridge devives.
+- [time](./roles/time/README.md): Configures time information.
 
 ### Playbooks
 
