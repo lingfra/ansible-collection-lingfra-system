@@ -1,0 +1,11 @@
+---
+# meta file for locale
+
+dependencies: []
+
+galaxy_info:
+  author: lingling
+  description: Configures locale information and generates them.
+  license: The Unlicense
+  min_ansible_version: "2.15"
+  platforms: []

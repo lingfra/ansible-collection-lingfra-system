@@ -1,0 +1,8 @@
+---
+# handlers file for locale
+
+- name: "Generate locales"
+  ansible.builtin.command:
+    argv: "{{ locale_gen_command_argv | lingfra.system.arch_chroot_argv(locale_chroot_path | default(null)) }}"
+  become: true
+  changed_when: true
