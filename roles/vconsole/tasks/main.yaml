@@ -1,0 +1,11 @@
+---
+# tasks file for vconsole
+
+- name: "Template {{ vconsole_conf_path }}"
+  ansible.builtin.template:
+    src: vconsole.conf.j2
+    dest: "{{ vconsole_conf_path | lingfra.system.chrooted_path(vconsole_chroot_path | default(none)) }}"
+    owner: root
+    group: root
+    mode: "0644"
+  become: true

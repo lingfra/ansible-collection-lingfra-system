@@ -1,0 +1,11 @@
+---
+# meta file for vconsole
+
+dependencies: []
+
+galaxy_info:
+  author: lingling
+  description: Templates vconsole.conf.
+  license: The Unlicense
+  min_ansible_version: "2.15"
+  platforms: []
