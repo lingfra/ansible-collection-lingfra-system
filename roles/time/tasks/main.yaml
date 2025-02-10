@@ -1,0 +1,33 @@
+---
+# tasks file for time
+
+- name: "Check if time_zone config is valid"
+  ansible.builtin.stat:
+    path: "{{ time_zone_file_path }}"
+  failed_when: >
+    st_time_zone_file_path.failed or
+    (not st_time_zone_file_path.stat.exists)
+  register: st_time_zone_file_path
+  tags:
+    - checks
+    - time
+
+- name: "Set time zone"
+  ansible.builtin.file:
+    path: "{{ '/etc/localtime' | lingfra.system.chrooted_path(time_chroot_path | default(none)) }}"
+    src: "{{ time_zone_file_path }}"
+    state: link
+  become: true
+  tags:
+    - configure
+    - time
+
+- name: "Generate {{ time_adjtime_path }}"
+  ansible.builtin.command:
+    argv: "{{ time_generate_adjtime_command_argv
+      | lingfra.system.arch_chroot_argv(time_chroot_path | default(none)) }}"
+    creates: "{{ time_adjtime_path | lingfra.system.chrooted_path(time_chroot_path | default(none)) }}"
+  become: true
+  tags:
+    - configure
+    - time

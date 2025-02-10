@@ -1,0 +1,8 @@
+---
+# vars file for time
+
+time_adjtime_path: /etc/adjtime
+time_generate_adjtime_command_argv:
+  - "hwclock"
+  - "--systohc"
+time_zone_file_path: "{{ ['/usr/share/zoneinfo', time_zone] | path_join }}"
