@@ -1,0 +1,33 @@
+---
+# tasks file for genfstab
+
+- name: "Run genfstab and register output"
+  ansible.builtin.command:
+    argv: "{{ genfstab_command_argv }}"
+  become: true
+  changed_when: true
+  register: genfstab_command_result
+  tags:
+    - configure
+    - genfstab
+
+- name: "Write new fstab into chroot"
+  ansible.builtin.copy:
+    content: "{{ genfstab_command_result.stdout }}"
+    dest: "{{ '/etc/fstab' | lingfra.system.chrooted_path(genfstab_chroot_path) }}"
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+  tags:
+    - configure
+    - genfstab
+
+# ---------- Clean-Up ----------
+
+- name: "Nullify runtime variables of genfstab"
+  ansible.builtin.set_fact:
+    genfstab_command_result: null
+  tags:
+    - clean-up
+    - genfstab

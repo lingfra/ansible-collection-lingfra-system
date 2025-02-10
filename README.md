@@ -9,6 +9,7 @@ functions.
 
 - [apt_source](./roles/apt_source/README.md): Configure APT sources on Deb-based
 systems.
+- [genfstab](./roles/genfstab/README.md): Generates an fstab on a target directory.
 - [grub](./roles/grub/README.md): Configures GRUB and generates its config.
 - [locale](./roles/locale/README.md): Configures locale information and generates them.
 - [mkinitcpio](./roles/mkinitcpio/README.md): Configures mkinitcpio and builds

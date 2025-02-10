@@ -1,0 +1,20 @@
+---
+# argument specs file for genfstab
+
+argument_specs:
+  main:
+    short_description: "Main entry point for genfstab role"
+    description:
+      - "This role runs `genfstab` and writes the fstab file."
+      - ""
+      - "Refer to [**genfstab(8)**](https://man.archlinux.org/man/genfstab.8) and [genfstab (ArchWiki)](https://wiki.archlinux.org/title/Genfstab) for more information."
+    author:
+      - "lingling"
+    options:
+      genfstab_chroot_path:
+        type: "str"
+        required: true
+        description:
+          - "This path is used as parameter _root_ for `genfstab`."
+          - "The `/etc/fstab` file will be placed under this path."
+          - "For example: `genfstab_chroot_path=/mnt` will write the fstab file to `/mnt/etc/fstab`."
