@@ -1,0 +1,5 @@
+---
+- name: Import lingfra.system.build_image
+  ansible.builtin.import_playbook: lingfra.system.build_image
+  vars:
+    target_build_image_host: localhost

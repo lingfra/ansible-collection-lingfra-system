@@ -1,0 +1,65 @@
+---
+- name: "Install python on Arch Linux hosts"
+  hosts: archlinux01
+  become: true
+  gather_facts: false
+  tasks:
+    - name: "Update pacman package cache"
+      ansible.builtin.raw: pacman -Sy
+      changed_when: false
+
+    - name: "Full system upgrade"
+      ansible.builtin.raw: pacman -Su --noconfirm
+      changed_when: false
+
+    - name: "Install python"
+      ansible.builtin.raw: pacman -S --noconfirm python
+      changed_when: false
+
+    - name: "Reboot system"
+      ansible.builtin.reboot:
+
+    - name: "Install common sys tools"
+      community.general.pacman:
+        name:
+          - htop
+          - kitty-terminfo
+          - ncdu
+          - neovim
+          - parted
+          - rsync
+          - tldr
+          - tmux
+          - which
+        state: present
+
+    - name: "Install scenario specific tools"
+      community.general.pacman:
+        name:
+          - arch-install-scripts
+          - qemu-img
+          - lvm2
+        state: present
+
+    # lvm2 triggers a rebuild of the initramfs
+    - name: "Reboot system again"
+      ansible.builtin.reboot:
+
+    - name: "Dynamically load nbd kernel module"
+      community.general.modprobe:
+        name: nbd
+        state: present
+        persistent: present
+      become: true
+
+    - name: "Create qcow2 image"
+      ansible.builtin.command:
+        cmd: qemu-img create -f qcow2 /root/archlinux.qcow2 20G
+        creates: /root/archlinux.qcow2
+      become: true
+
+    - name: "Connect to qcow2 image"
+      ansible.builtin.command:
+        cmd: qemu-nbd --connect=/dev/nbd0 /root/archlinux.qcow2
+      become: true
+      changed_when: true
