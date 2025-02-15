@@ -72,10 +72,6 @@
     - build
     - mkinitcpio
 
-  when:
-    - mkinitcpio_build_initramfs
-    - template_mkinitcpio_result.changed or (mkinitcpio_sd_tool_changed | default(false))
-
   block:
     - name: "Include tasks build_initramfs"
       ansible.builtin.include_tasks:
@@ -84,6 +80,9 @@
           tags:
             - build
             - mkinitcpio
+      when:
+        - mkinitcpio_build_initramfs
+        - template_mkinitcpio_result.changed or (mkinitcpio_sd_tool_changed | default(false))
 
   rescue:
     - name: "Fail if no backup file is found"
@@ -110,18 +109,19 @@
             - build
             - mkinitcpio
 
-# ---------- Clean-Up ----------
+  always:
+    - name: "Remove mkinitcpio.conf backup file"
+      ansible.builtin.file:
+        path: "{{ mkinitcpio_conf_backup_file }}"
+        state: absent
+      become: true
+      tags:
+        - clean-up
+        - mkinitcpio
+      when:
+        - mkinitcpio_conf_backup_file is not none
 
-- name: "Remove mkinitcpio.conf backup file"
-  ansible.builtin.file:
-    path: "{{ mkinitcpio_conf_backup_file }}"
-    state: absent
-  become: true
-  tags:
-    - clean-up
-    - mkinitcpio
-  when:
-    - mkinitcpio_conf_backup_file
+# ---------- Clean-Up ----------
 
 - name: "Nullify runtime variables for mkinitcpio"
   ansible.builtin.set_fact:
