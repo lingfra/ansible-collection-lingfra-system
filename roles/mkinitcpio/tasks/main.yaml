@@ -82,7 +82,9 @@
             - mkinitcpio
       when:
         - mkinitcpio_build_initramfs
-        - template_mkinitcpio_result.changed or (mkinitcpio_sd_tool_changed | default(false))
+        - template_mkinitcpio_result.changed or
+          (mkinitcpio_sd_tool_changed | default(false)) or
+          mkinitcpio_force_build
 
   rescue:
     - name: "Fail if no backup file is found"

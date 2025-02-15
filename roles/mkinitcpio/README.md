@@ -118,6 +118,12 @@ Type: `str`, optional.
 
 Refer to [**mkinitcpio.conf(5)**](https://man.archlinux.org/man/mkinitcpio.conf.5) variable `MODULES_DECOMPRESS`.
 
+#### `mkinitcpio_force_build`
+
+Type: `bool`, Default: `False`.
+
+Build / rebuild the new initramfs regardless of change state.
+
 #### `mkinitcpio_sd_tool_enable`
 
 Type: `bool`, Default: `False`.
