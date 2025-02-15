@@ -9,7 +9,7 @@ mkinitcpio_conf_binaries: []
 # Refer to [**mkinitcpio.conf(5)**](https://man.archlinux.org/man/mkinitcpio.conf.5) variable `FILES`.
 mkinitcpio_conf_files: []
 # Refer to [**mkinitcpio.conf(5)**](https://man.archlinux.org/man/mkinitcpio.conf.5) variable `HOOKS`.
-# Additionally, the note the [Common hooks](https://wiki.archlinux.org/title/Mkinitcpio#Common_hooks) section of the [Mkinitcpio](https://wiki.archlinux.org/title/Mkinitcpio) article in the [Arch Wiki](https://wiki.archlinux.org).
+# In addition, see the [Common Hooks](https://wiki.archlinux.org/title/Mkinitcpio#Common_hooks) section of the [Mkinitcpio article in the Arch Wiki](https://wiki.archlinux.org/title/Mkinitcpio).
 mkinitcpio_conf_hooks:
   - base
   - udev
@@ -25,6 +25,8 @@ mkinitcpio_conf_hooks:
   - fsck
 # Refer to [**mkinitcpio.conf(5)**](https://man.archlinux.org/man/mkinitcpio.conf.5) variable `MODULES`.
 mkinitcpio_conf_modules: []
-# Whether systemd-tool should be installed and configured or not.
-# If set to `true` the role lingfra.system.mkinitcpio_sd_tool will be pulled in as role dependency.
+# Build / rebuild the new initramfs regardless of change state.
+mkinitcpio_force_build: false
+# Whether or not to install and configure [mkinitcpio-systemd-tool](https://github.com/random-archer/mkinitcpio-systemd-tool).
+# If set to `true`, the role [lingfra.system.mkinitcpio_sd_tool](https://codeberg.org/lingfra/ansible-collection-lingfra-system/src/branch/main/roles/mkinitcpio_sd_tool/README.md) will be imported.
 mkinitcpio_sd_tool_enable: false
