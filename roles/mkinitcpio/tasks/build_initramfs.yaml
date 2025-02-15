@@ -3,7 +3,7 @@
 
 - name: "Execute mkinitcpio to build initramfs"
   ansible.builtin.command:
-    argv: "{{ mkinitcpio_built_command_argv | lingfra.system.arch_chroot_argv(mkinitcpio_chroot_dir | default(none)) }}"
+    argv: "{{ mkinitcpio_built_command_argv | lingfra.system.arch_chroot_argv(mkinitcpio_chroot_path | default(none)) }}"
   become: true
   changed_when: true
   register: mkinitcpio_built_result

@@ -3,7 +3,7 @@
 
 - name: "Install dependencies for mkinitcpio-systemd-tool"
   ansible.builtin.command:
-    argv: "{{ (['pacman', '-Sy', '--noconfirm'] + mkinitcpio_sd_tool_packages) | lingfra.system.arch_chroot_argv(mkinitcpio_sd_tool_chroot_dir) }}"
+    argv: "{{ (['pacman', '-Sy', '--noconfirm'] + mkinitcpio_sd_tool_packages) | lingfra.system.arch_chroot_argv(mkinitcpio_sd_tool_chroot_path) }}"
   changed_when: true
   become: true
   tags:
@@ -12,7 +12,7 @@
 
 - name: "Enable required units for mkinitcpio-systemd-tool with command module for chroot"
   ansible.builtin.command:
-    argv: "{{ ['systemctl', 'enable', unit] | lingfra.system.arch_chroot_argv(mkinitcpio_sd_tool_chroot_dir) }}"
+    argv: "{{ ['systemctl', 'enable', unit] | lingfra.system.arch_chroot_argv(mkinitcpio_sd_tool_chroot_path) }}"
   become: true
   changed_when: true
   loop: "{{ mkinitcpio_sd_tool_units }}"

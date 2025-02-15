@@ -17,15 +17,15 @@
   ansible.builtin.include_tasks:
     file: system.yaml
   when: >
-    (mkinitcpio_sd_tool_chroot_dir is not defined) or
-    (mkinitcpio_sd_tool_chroot_dir | length == 0)
+    (mkinitcpio_sd_tool_chroot_path is not defined) or
+    (mkinitcpio_sd_tool_chroot_path | length == 0)
 
 - name: "Include tasks for chrooted environment"
   ansible.builtin.include_tasks:
     file: chroot.yaml
   when:
-    - mkinitcpio_sd_tool_chroot_dir is defined
-    - mkinitcpio_sd_tool_chroot_dir | length > 0
+    - mkinitcpio_sd_tool_chroot_path is defined
+    - mkinitcpio_sd_tool_chroot_path | length > 0
 
 - name: "Add sysroot entry to crypttab of mkinitcpio-systemd-tool"
   community.general.crypttab:
@@ -34,7 +34,7 @@
     password: "{{ entry.password | default('none') }}"
     opts: "{{ entry.options | default('luks') }}"
     state: present
-    path: "{{ mkinitcpio_sd_tool_crypttab_path | lingfra.system.path_under_chroot(mkinitcpio_sd_tool_chroot_dir | default(none)) }}"
+    path: "{{ mkinitcpio_sd_tool_crypttab_path | lingfra.system.chrooted_path(mkinitcpio_sd_tool_chroot_path | default(none)) }}"
   become: true
   register: mkinitcpio_sd_tool_crypttab_result
   loop: "{{ mkinitcpio_sd_tool_crypttab_entries }}"
@@ -48,7 +48,7 @@
 - name: "Add sysroot entry to fstab of mkinitcpio-systemd-tool"
   ansible.builtin.template:
     src: fstab.j2
-    dest: "{{ mkinitcpio_sd_tool_fstab_path | lingfra.system.path_under_chroot(mkinitcpio_sd_tool_chroot_dir | default(none)) }}"
+    dest: "{{ mkinitcpio_sd_tool_fstab_path | lingfra.system.chrooted_path(mkinitcpio_sd_tool_chroot_path | default(none)) }}"
     owner: root
     group: root
     mode: "0400"
@@ -63,7 +63,7 @@
     exclusive: true
     key: "{{ mkinitcpio_sd_tool_ssh_pub_key }}"
     manage_dir: false
-    path: "{{ mkinitcpio_sd_tool_authorized_keys_path | lingfra.system.path_under_chroot(mkinitcpio_sd_tool_chroot_dir | default(none)) }}"
+    path: "{{ mkinitcpio_sd_tool_authorized_keys_path | lingfra.system.chrooted_path(mkinitcpio_sd_tool_chroot_path | default(none)) }}"
     state: present
     user: root
   become: true
