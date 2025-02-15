@@ -24,7 +24,7 @@ argument_specs:
     author:
       - "lingling"
     options:
-      mkinitcpio_sd_tool_chroot_dir:
+      mkinitcpio_sd_tool_chroot_path:
         type: "str"
         required: false
         description:

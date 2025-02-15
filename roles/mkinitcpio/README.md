@@ -22,7 +22,7 @@ comments on individual modules.
 - Customizable path to `mkinitcpio.conf` with the variable
 [`mkinitcpio_conf_path`](#mkinitcpio_conf_path).
 - Support for chrooted environment, see
-[`mkinitcpio_chroot_dir`](#mkinitcpio_chroot_dir).
+[`mkinitcpio_chroot_path`](#mkinitcpio_chroot_path).
 - Build the initramfs.
   - Restores previous configuration and rebuilds in case of failure.
 - Optionally import
@@ -43,9 +43,7 @@ This role has only been tested on Arch Linux machines.
 
 Not specified.
 
-## Role Arguments
-
-### Entrypoint `main` - Main entry point for mkinitcpio role
+## Entrypoint `main` - Main entry point for mkinitcpio role
 
 The main scope of this role's entrypoint is to template the `mkinitcpio` configuration and then build the initramfs.
 If it is not desired to build the initramfs, it is possible to disable it by setting [`mkinitcpio_build_initramfs`](#mkinitcpio_build_initramfs) to `false`.
@@ -58,13 +56,15 @@ Another useful resource is the example `mkinitcpio.conf` in the [upstream reposi
 
 See [`mkinitcpio_sd_tool_enable`](#mkinitcpio_sd_tool_enable) to install and configure mkinitcpio-systemd-tool for remote root device unlocking over SSH.
 
+### Options for `main`
+
 #### `mkinitcpio_build_initramfs`
 
 Type: `bool`, Default: `True`.
 
 Whether initramfs should be build or not.
 
-#### `mkinitcpio_chroot_dir`
+#### `mkinitcpio_chroot_path`
 
 Type: `str`, optional.
 
@@ -124,9 +124,11 @@ Type: `bool`, Default: `False`.
 
 Whether or not to install and configure [mkinitcpio-systemd-tool](https://github.com/random-archer/mkinitcpio-systemd-tool). If set to `true`, the role [lingfra.system.mkinitcpio_sd_tool](https://codeberg.org/lingfra/ansible-collection-lingfra-system/src/branch/main/roles/mkinitcpio_sd_tool/README.md) will be imported.
 
-### Entrypoint `internal` - General internal role variables
+## Entrypoint `internal` - General internal role variables
 
 This is a synthetic entry point, which is used for custom argument validation and documentation. Your playbook will fail if you use this entry point.
+
+### Options for `internal`
 
 #### `mkinitcpio_built_command_argv`
 

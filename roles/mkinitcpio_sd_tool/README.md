@@ -7,9 +7,7 @@ Installs and configures mkinitcpio-systemd-tool for remote root device decryptio
 
 Not specified.
 
-## Role Arguments
-
-### Entrypoint `main` - Main entry point for mkinitcpio_sd_tool role
+## Entrypoint `main` - Main entry point for mkinitcpio_sd_tool role
 
 This role makes the necessary preparations for using [mkinitcpio-systemd-tool](https://github.com/random-archer/mkinitcpio-systemd-tool).
 The main scope is to configure networking for root device decryption over SSH in early initramfs.
@@ -28,7 +26,9 @@ This can be fixed by setting `rootflags=x-systemd.device-timeout=0` (0 disables 
 This role does not modify kernel parameters, so this must be done manually if desired.
 See also <https://wiki.archlinux.org/title/Dm-crypt/System_configuration#Timeout>.
 
-#### `mkinitcpio_sd_tool_chroot_dir`
+### Options for `main`
+
+#### `mkinitcpio_sd_tool_chroot_path`
 
 Type: `str`, optional.
 
@@ -93,9 +93,11 @@ Type: `str`, **required**.
 
 SSH public keys for early userspace unlocking access. The keys are copied to an `authorized_keys` file in a custom location. Any keys not specified in this variable will be removed from the custom `authorized_keys` file! Add multiple keys by separating them with newlines. Since [mkinitcpio-systemd-tool](https://github.com/random-archer/mkinitcpio-systemd-tool) uses tinysshd as its SSH server, the keys must be of the type ed25519. Refer to [**tinysshd(8)**](https://man.archlinux.org/man/extra/tinyssh/tinysshd.8.en) for more information and to [**ssh-keygen(1)**](https://man.archlinux.org/man/ssh-keygen.1.en) if you need to generate a new key.
 
-### Entrypoint `internal` - General internal role variables
+## Entrypoint `internal` - General internal role variables
 
 This is a synthetic entry point, which is used for custom argument validation and documentation. Your playbook will fail if you use this entry point.
+
+### Options for `internal`
 
 #### `mkinitcpio_sd_tool_authorized_keys_path`
 

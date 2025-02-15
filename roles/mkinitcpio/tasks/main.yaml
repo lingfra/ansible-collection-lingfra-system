@@ -40,7 +40,7 @@
   ansible.builtin.import_role:
     name: lingfra.system.mkinitcpio_sd_tool
   vars:
-    mkinitcpio_sd_tool_chroot_dir: "{{ mkinitcpio_chroot_dir | default('') }}"
+    mkinitcpio_sd_tool_chroot_path: "{{ mkinitcpio_chroot_path | default('') }}"
   when:
     mkinitcpio_sd_tool_enable
 
@@ -49,7 +49,7 @@
 - name: "Template mkinitcpio.conf"
   ansible.builtin.template:
     src: mkinitcpio.conf.j2
-    dest: "{{ mkinitcpio_conf_path | lingfra.system.path_under_chroot(mkinitcpio_chroot_dir | default(none)) }}"
+    dest: "{{ mkinitcpio_conf_path | lingfra.system.chrooted_path(mkinitcpio_chroot_path | default(none)) }}"
     owner: root
     group: root
     mode: "0644"

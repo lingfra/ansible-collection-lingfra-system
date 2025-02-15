@@ -23,7 +23,7 @@ argument_specs:
         default: true
         description:
           - "Whether initramfs should be build or not."
-      mkinitcpio_chroot_dir:
+      mkinitcpio_chroot_path:
         type: "str"
         required: false
         description:
