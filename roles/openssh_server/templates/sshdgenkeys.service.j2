@@ -1,0 +1,18 @@
+{{ ansible_managed | ansible.builtin.comment }}
+
+[Unit]
+Description=Generate SSH Host Keys
+{% for host_key_type in openssh_server_host_key_types %}
+ConditionPathExists=|!/etc/ssh/ssh_host_{{ host_key_type }}_key
+ConditionPathExists=|!/etc/ssh/ssh_host_{{ host_key_type }}_key.pub
+{% endfor %}
+
+[Service]
+{% for host_key_type in openssh_server_host_key_types %}
+ExecStart=/usr/bin/ssh-keygen -t {{ host_key_type }} -f /etc/ssh/ssh_host_{{ host_key_type }}_key -N ""
+{% endfor %}
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

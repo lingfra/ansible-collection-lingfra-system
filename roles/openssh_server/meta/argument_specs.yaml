@@ -1,0 +1,256 @@
+---
+# argument specs file for openssh_server
+
+argument_specs:
+  main:
+    short_description: "Main entry point for openssh_server role"
+    description:
+      - "Running the role from this entrypoint installs and configures the OpenSSH server."
+    author:
+      - "lingling"
+    examples: |
+      ```yaml
+      # Showing some generic options
+      - name: Import role lingfra.system.openssh_server
+        ansible.builtin.import_role:
+          name: lingfra.system.openssh_server
+        vars:
+          # Limit listen address to one specific interface
+          openssh_server_conf_listen_address_list:
+            - 192.168.1.20
+          # Changing port
+          openssh_server_conf_port: 12345
+
+      # Configure OpenSSH server in a new chroot
+      - name: "Import role lingfra.system.openssh_server"
+        ansible.builtin.import_role:
+          name: lingfra.system.openssh_server
+        vars:
+          # If you configure your system in a chroot (e. g. when installing from live ISO or building an image)
+          openssh_server_chroot_path: /target
+          # For security root isn't allowed to login over SSH by default, but in this case we enable this
+          openssh_server_conf_permit_root_login: true
+          # Deleting possible pre-generated host keys, so new keys will be generated at first start (important for images)
+          openssh_server_host_key_reset: true
+          # The OpenSSH server package maybe is pre-installed and it could cause problems
+          openssh_server_install: false
+
+      # Showing hardening
+      - name: "Import role lingfra.system.openssh_server"
+        ansible.builtin.import_role:
+          name: lingfra.system.openssh_server
+        vars:
+          # Hardening cryptography
+          # Source: https://www.sshaudit.com/hardening_guides.html (2025)
+          openssh_server_conf_ca_signature_algorithms:
+            - sk-ssh-ed25519@openssh.com
+            - ssh-ed25519
+            - rsa-sha2-512
+            - rsa-sha2-256
+
+          openssh_server_conf_ciphers:
+            - aes256-gcm@openssh.com
+            - aes256-ctr
+            - aes192-ctr
+            - aes128-gcm@openssh.com
+            - aes128-ctr
+
+          openssh_server_conf_hostbased_accepted_algorithms:
+            - sk-ssh-ed25519-cert-v01@openssh.com
+            - ssh-ed25519-cert-v01@openssh.com
+            - rsa-sha2-512-cert-v01@openssh.com
+            - rsa-sha2-256-cert-v01@openssh.com
+            - sk-ssh-ed25519@openssh.com
+            - ssh-ed25519
+            - rsa-sha2-512
+            - rsa-sha2-256
+
+          openssh_server_conf_host_key_algorithms:
+            - sk-ssh-ed25519-cert-v01@openssh.com
+            - ssh-ed25519-cert-v01@openssh.com
+            - rsa-sha2-512-cert-v01@openssh.com
+            - rsa-sha2-256-cert-v01@openssh.com
+            - sk-ssh-ed25519@openssh.com
+            - ssh-ed25519
+            - rsa-sha2-512
+            - rsa-sha2-256
+
+          openssh_server_conf_kex_algorithms:
+            - sntrup761x25519-sha512@openssh.com
+            - curve25519-sha256
+            - curve25519-sha256@libssh.org
+            - diffie-hellman-group18-sha512
+            - diffie-hellman-group-exchange-sha256
+            - diffie-hellman-group16-sha512
+
+          openssh_server_conf_macs:
+            - hmac-sha2-512-etm@openssh.com
+            - hmac-sha2-256-etm@openssh.com
+            - umac-128-etm@openssh.com
+
+          openssh_server_conf_pubkey_accepted_algorithms:
+            - sk-ssh-ed25519-cert-v01@openssh.com
+            - ssh-ed25519-cert-v01@openssh.com
+            - rsa-sha2-512-cert-v01@openssh.com
+            - rsa-sha2-256-cert-v01@openssh.com
+            - sk-ssh-ed25519@openssh.com
+            - ssh-ed25519
+            - rsa-sha2-512
+            - rsa-sha2-256
+      ```
+    options:
+      openssh_server_chroot_path:
+        type: "str"
+        required: false
+        description:
+          - "If specified, all actions of this role are executed in the chroot directory."
+          - "Please note that some features do not work in a chroot."
+      openssh_server_conf_enable_drop_ins:
+        type: "bool"
+        default: true
+        description:
+          - "Whether or not to load drop in files."
+      openssh_server_conf_enable_sftp:
+        type: "bool"
+        default: true
+        description:
+          - "Whether or not to enable SFTP (SSH File Transfer Protocol)."
+      openssh_server_conf_authentication_methods:
+        type: "list"
+        elements: "str"
+        default:
+          - "publickey"
+        description:
+          - "Please be sure to read and understand this options before modifying it, see [**sshd_config(5)** AuthenticationMethods](https://man.archlinux.org/man/sshd_config.5.en#AuthenticationMethods)"
+          - "You can disable this option by setting it to `null` or an empty string."
+          - "To mimic the example from the man page, set this variable to `['publickey,password', 'publickey,keyboard-interactive']`."
+      openssh_server_conf_allow_users:
+        type: "list"
+        elements: "str"
+        required: false
+        description:
+          - "A list of allowed users to connect to the OpenSSH server."
+          - "Won't be configured if omitted."
+      openssh_server_conf_kex_algorithms:
+        type: "list"
+        elements: "str"
+        required: false
+      openssh_server_conf_ciphers:
+        type: "list"
+        elements: "str"
+        required: false
+      openssh_server_conf_macs:
+        type: "list"
+        elements: "str"
+        required: false
+      openssh_server_conf_host_key_algorithms:
+        type: "list"
+        elements: "str"
+        required: false
+      openssh_server_conf_ca_signature_algorithms:
+        type: "list"
+        elements: "str"
+        required: false
+      openssh_server_conf_hostbased_accepted_algorithms:
+        type: "list"
+        elements: "str"
+        required: false
+      openssh_server_conf_kbd_interactive_authentication:
+        type: "bool"
+        default: false
+      openssh_server_conf_listen_address_list:
+        type: "list"
+        elements: "str"
+        required: false
+        description:
+          - "List of addresses for OpenSSH to listen on."
+          - "Will listen on all local addresses if unspecified."
+      openssh_server_conf_max_auth_tries:
+        type: "int"
+        default: 3
+      openssh_server_conf_password_authentication:
+        type: "bool"
+        default: false
+      openssh_server_conf_port:
+        type: "int"
+        required: false
+        description:
+          - "The port on which the OpenSSH server should be listen."
+      openssh_server_conf_permit_empty_passwords:
+        type: "bool"
+        default: false
+      openssh_server_conf_permit_root_login:
+        type: "bool"
+        default: false
+        description:
+          - "Whether root is allowed to login over ssh or not."
+      openssh_server_conf_pubkey_authentication:
+        type: "bool"
+        default: true
+      openssh_server_conf_pubkey_accepted_algorithms:
+        type: "list"
+        elements: "str"
+        required: false
+      openssh_server_conf_use_pam:
+        type: "bool"
+        default: true
+      openssh_server_drop_in_files:
+        type: "list"
+        elements: "dict"
+        required: false
+        description:
+          - "List of drop-in files."
+        options:
+          name:
+            type: "str"
+            required: true
+            description:
+              - "Name of the drop-in file, e. g. `30-auth"
+          content:
+            type: "str"
+            required: false
+            description:
+              - "Content of the drop-in file."
+          state:
+            type: "str"
+            required: false
+            choices:
+              - "absent"
+              - "present"
+            description:
+              - "Whether the file should be present or not."
+      openssh_server_host_key_types:
+        type: "list"
+        elements: "str"
+        default:
+          - "ed25519"
+        choices:
+          - "ecdsa"
+          - "ed25519"
+          - "rsa"
+        # description:
+          # - "Detailed explanation of what this option does."
+      openssh_server_host_key_reset:
+        type: "bool"
+        default: false
+        description:
+          - "Setting this to true will delete all host keys."
+          - "Use with care!"
+      openssh_server_install:
+        type: "bool"
+        default: true
+        description:
+          - "Whether the OpenSSH system packages should be installed or not."
+      openssh_server_systemd_service_enable:
+        type: "bool"
+        default: true
+        description:
+          - "Whether the OpenSSH systemd service should be enabled or not."
+          - "If the service is already running and this variable is set to `false` it disables the service."
+          - "This option has no effect if [`openssh_server_chroot_path`](#openssh_server_chroot_path) is defined."
+      openssh_server_systemd_service_restart:
+        type: "bool"
+        default: true
+        description:
+          - "Whether the OpenSSH systemd service should be (re-)started or not."
+          - "This option has no effect if [`openssh_server_chroot_path`](#openssh_server_chroot_path) is defined."

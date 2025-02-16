@@ -1,0 +1,10 @@
+---
+# vars file for lingfra.system.openssh_server
+
+# Debian
+
+openssh_server_binary_path: /usr/sbin/sshd
+openssh_server_pkg_names:
+  - openssh-server
+openssh_server_sftp_path: /usr/lib/openssh/sftp-server
+openssh_server_systemd_service_name: ssh.service

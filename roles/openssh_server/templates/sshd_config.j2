@@ -1,0 +1,75 @@
+################################################################################
+#
+# {{ ansible_managed }}
+#
+# /etc/ssh/sshd_config
+#
+# See following resources for more information:
+#
+#   - sshd_config(5)
+#
+################################################################################
+
+# Network settings
+{% if (openssh_server_conf_listen_address_list is defined) and (openssh_server_conf_listen_address_list | length > 0) %}
+{% for address in openssh_server_conf_listen_address_list %}
+ListenAddress {{ address }}
+{% endfor %}
+{% endif %}
+{% if (openssh_server_conf_port is defined) %}
+Port {{ openssh_server_conf_port }}
+{% endif %}
+
+# Cryptography
+{% if (openssh_server_conf_ca_signature_algorithms is defined) %}
+CASignatureAlgorithms {{ openssh_server_conf_ca_signature_algorithms | join(',') }}
+{% endif %}
+{% if (openssh_server_conf_ciphers is defined) %}
+Ciphers {{ openssh_server_conf_ciphers | join(',') }}
+{% endif %}
+{% if (openssh_server_conf_hostbased_accepted_algorithms is defined) %}
+HostbasedAcceptedAlgorithms {{ openssh_server_conf_hostbased_accepted_algorithms | join(',') }}
+{% endif %}
+{% if (openssh_server_conf_host_key_algorithms is defined) %}
+HostKeyAlgorithms {{ openssh_server_conf_host_key_algorithms | join(',') }}
+{% endif %}
+{% for key_type in openssh_server_host_key_types %}
+HostKey /etc/ssh/ssh_host_{{ key_type }}_key
+{% endfor %}
+{% if (openssh_server_conf_kex_algorithms is defined) %}
+KexAlgorithms {{ openssh_server_conf_kex_algorithms | join(',') }}
+{% endif %}
+{% if (openssh_server_conf_macs is defined) %}
+MACs {{ openssh_server_conf_macs | join(',') }}
+{% endif %}
+{% if (openssh_server_conf_pubkey_accepted_algorithms is defined) %}
+PubkeyAcceptedAlgorithms {{ openssh_server_conf_pubkey_accepted_algorithms | join(',') }}
+{% endif %}
+
+# Authentication
+{% if (openssh_server_conf_allow_users is defined) %}
+AllowUsers {{ openssh_server_conf_allow_users | join(' ') }}
+{% endif %}
+{% if (openssh_server_conf_authentication_methods is defined) and (openssh_server_conf_authentication_methods is not none) and (openssh_server_conf_authentication_methods | length > 0) %}
+AuthenticationMethods {{ openssh_server_conf_authentication_methods | join(' ') }}
+{% endif %}
+KbdInteractiveAuthentication {{ openssh_server_conf_kbd_interactive_authentication | ansible.builtin.ternary('yes', 'no', none_val='no') }}
+MaxAuthTries {{ openssh_server_conf_max_auth_tries }}
+PasswordAuthentication {{ openssh_server_conf_password_authentication | ansible.builtin.ternary('yes', 'no', none_val='no') }}
+PermitEmptyPasswords {{ openssh_server_conf_permit_empty_passwords | ansible.builtin.ternary('yes', 'no', none_val='no') }}
+PermitRootLogin {{ openssh_server_conf_permit_root_login | ansible.builtin.ternary('yes', 'no', none_val='no') }}
+PubkeyAuthentication {{ openssh_server_conf_pubkey_authentication | ansible.builtin.ternary('yes', 'no', none_val='no') }}
+UsePAM {{ openssh_server_conf_use_pam | ansible.builtin.ternary('yes', 'no', none_val='no') }}
+
+# Allow client to pass locale environment variables
+AcceptEnv LANG LC_*
+
+{% if openssh_server_conf_enable_sftp %}
+# Set SFTP subsystem
+Subsystem sftp {{ openssh_server_sftp_path }}
+{% endif %}
+
+{% if openssh_server_conf_enable_drop_ins %}
+# Load drop in files
+Include /etc/ssh/sshd_config.d/*.conf
+{% endif %}

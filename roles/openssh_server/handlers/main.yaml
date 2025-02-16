@@ -1,0 +1,12 @@
+---
+# handlers file for lingfra.system.openssh_server
+
+- name: Restart openssh server
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: "{{ openssh_server_systemd_service_name }}"
+    state: restarted
+  become: true
+  when:
+    - openssh_server_chroot_path is not defined
+    - openssh_server_systemd_service_restart

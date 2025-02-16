@@ -1,0 +1,147 @@
+---
+# tasks file for lingfra.system.openssh_server
+
+- name: "Include OS specific variables for openssh_server"
+  ansible.builtin.include_vars:
+    file: "{{ lookup('ansible.builtin.first_found', params) }}"
+  tags:
+    - always
+  vars:
+    params:
+      files:
+        - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yaml"
+        - "{{ ansible_distribution }}.yaml"
+        - "defaults.yaml"
+      paths:
+        - "vars"
+
+# ---------- Installation ----------
+
+- name: "Install OpenSSH package(s)"
+  ansible.builtin.package:
+    name: "{{ openssh_server_pkg_names }}"
+    state: present
+  become: true
+  tags:
+    - installation
+    - openssh_server
+  when:
+    - openssh_server_install
+
+# ---------- SSH Host Keys ----------
+
+- name: "Reset host keys"
+  ansible.builtin.file:
+    path: "{{ host_key_path | lingfra.system.chrooted_path(openssh_server_chroot_path | default(none)) }}"
+    state: absent
+  become: true
+  loop:
+    - ecdsa_key
+    - ecdsa_key.pub
+    - ed25519_key
+    - ed25519_key.pub
+    - rsa_key
+    - rsa_key.pub
+  loop_control:
+    loop_var: host_key
+  vars:
+    host_key_path: "{{ '/etc/ssh/ssh_host_' ~ host_key }}"
+  when:
+    - openssh_server_host_key_reset
+
+- name: "Template sshdgenkeys.service"
+  ansible.builtin.template:
+    src: sshdgenkeys.service.j2
+    dest: "{{ '/etc/systemd/system/sshdgenkeys.service' | lingfra.system.chrooted_path(openssh_server_chroot_path | default(none)) }}"
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+  register: openssh_server_template_sshdgenkeys
+  tags:
+    - configuration
+    - openssh_server
+
+- name: "Enable sshdgenkeys.service"
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: sshdgenkeys.service
+    enabled: true
+    state: "{{ 'started' if openssh_server_template_sshdgenkeys.changed else omit }}"
+  become: true
+  tags:
+    - configuration
+    - openssh_server
+  when:
+    - openssh_server_chroot_path is not defined
+
+# ---------- Configuration ----------
+
+- name: "Template sshd_config"
+  ansible.builtin.template:
+    src: sshd_config.j2
+    dest: "{{ openssh_server_sshd_config_path | lingfra.system.chrooted_path(openssh_server_chroot_path | default(none)) }}"
+    owner: root
+    group: root
+    mode: "0644"
+    backup: true
+    validate: "{{ openssh_server_binary_path }} -t -f %s"
+  become: true
+  diff: true
+  notify:
+    - Restart openssh server
+  tags:
+    - configuration
+    - openssh_server
+
+- name: "Copy drop-in configurations"
+  ansible.builtin.copy:
+    content: "{{ drop_in_file.content | default('') }}"
+    dest: "{{ ([openssh_server_sshd_config_d_path, drop_in_file.name ~ '.conf'] | path_join) | lingfra.system.chrooted_path(openssh_server_chroot_path | default(none)) }}"
+    owner: root
+    group: root
+    mode: "0644"
+    backup: false
+    validate: "{{ openssh_server_binary_path }} -t -f %s"
+  become: true
+  diff: true
+  loop: "{{ openssh_server_drop_in_files | default([]) }}"
+  loop_control:
+    loop_var: drop_in_file
+    label: "{{ drop_in_file.name }}"
+  notify:
+    - Restart openssh server
+  tags:
+    - configuration
+    - openssh_server
+  when:
+    - drop_in_file.state | default('present') == 'present'
+
+- name: "Remove drop-in files"
+  ansible.builtin.file:
+    path: "{{ ([openssh_server_sshd_config_d_path, drop_in_file.name ~ '.conf'] | path_join) | lingfra.system.chrooted_path(openssh_server_chroot_path | default(none)) }}"
+    state: absent
+  become: true
+  diff: true
+  loop: "{{ openssh_server_drop_in_files | default([]) }}"
+  loop_control:
+    loop_var: drop_in_file
+    label: "{{ drop_in_file.name }}"
+  notify:
+    - Restart openssh server
+  tags:
+    - configuration
+    - openssh_server
+  when:
+    - drop_in_file.state | default('present') == 'absent'
+
+- name: "Manage OpenSSH systemd service"
+  ansible.builtin.systemd:
+    name: "{{ openssh_server_systemd_service_name }}"
+    enabled: "{{ true if openssh_server_systemd_service_enable else false }}"
+  become: true
+  tags:
+    - configuration
+    - openssh_server
+  when:
+    - openssh_server_chroot_path is not defined

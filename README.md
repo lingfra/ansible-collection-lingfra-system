@@ -16,6 +16,7 @@ systems.
 the initramfs.
 - [mkinitcpio_sd_tool](./roles/mkinitcpio_sd_tool/README.md): Installs and
 configures mkinitcpio-systemd-tool for remote root device decryption over SSH.
+- [openssh_server](./roles/openssh_server/README.md): Configures OpenSSH server.
 - [pacman](./roles/pacman/README.md): Configures the Pacman package manager and
 its mirrors.
 - [pacstrap](./roles/pacstrap/README.md): Runs pacstrap on a target folder.
