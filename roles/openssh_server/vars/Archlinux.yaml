@@ -1,0 +1,10 @@
+---
+# vars file for lingfra.system.openssh_server
+
+# Archlinux
+
+openssh_server_binary_path: /usr/bin/sshd
+openssh_server_pkg_names:
+  - openssh
+openssh_server_sftp_path: /usr/lib/ssh/sftp-server
+openssh_server_systemd_service_name: sshd.service
