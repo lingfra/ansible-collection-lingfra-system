@@ -1,4 +1,6 @@
 ---
+# Playbook lingfra.system.initial_provision
+
 - name: "Initial provision"
   hosts: "{{ target | default('all') }}"
   gather_facts: true
