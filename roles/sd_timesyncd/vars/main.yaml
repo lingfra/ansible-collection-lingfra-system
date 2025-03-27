@@ -1,0 +1,4 @@
+---
+# vars file for lingfra.system.sd_timesyncd
+
+sd_timesyncd_config_dir: /etc/systemd/timesyncd.conf.d

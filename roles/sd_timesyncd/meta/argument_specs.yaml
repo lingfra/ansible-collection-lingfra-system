@@ -1,0 +1,25 @@
+---
+# argument specs file for lingfra.system.sd_timesyncd
+
+argument_specs:
+  main:
+    short_description: "Main entry point for sd_timesyncd role"
+    description:
+      - "This role configures systemd-timesyncd on the target hosts."
+      - "The options will be set in drop-in files under `/etc/systemd/timesyncd.conf.d`."
+      - "Please refer to [**timesyncd.conf(5)**]() for details on the `sd_timesyncd_conf_*` variables."
+    author:
+      - "lingling"
+    options:
+      sd_timesyncd_conf_ntp:
+        type: "list"
+        elements: "str"
+        default:
+          - 0.pool.ntp.org
+          - 1.pool.ntp.org
+          - 2.pool.ntp.org
+          - 3.pool.ntp.org
+      sd_timesyncd_conf_fallback_ntp:
+        type: "list"
+        elements: "str"
+        required: false

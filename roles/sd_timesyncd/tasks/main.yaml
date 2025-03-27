@@ -1,0 +1,31 @@
+---
+# tasks file for lingfra.system.sd_timesyncd
+
+- name: "Create directory {{ sd_timesyncd_config_dir }}"
+  ansible.builtin.file:
+    path: "{{ sd_timesyncd_config_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  become: true
+
+- name: "Template NTP servers config"
+  ansible.builtin.template:
+    src: ntp.conf.j2
+    dest: "{{ sd_timesyncd_ntp_conf_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+  notify:
+    - Restart systemd-timesyncd
+  vars:
+    sd_timesyncd_ntp_conf_path: "{{ (sd_timesyncd_config_dir, '90-ntp.conf') | path_join }}"
+
+- name: "Enable and start systemd-timesyncd"
+  ansible.builtin.systemd:
+    name: systemd-timesyncd.service
+    enabled: true
+    state: started
+  become: true
