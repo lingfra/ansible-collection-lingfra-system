@@ -6,3 +6,46 @@
 
 - name: Import lingfra.system.pkgs
   ansible.builtin.import_playbook: lingfra.system.pkgs
+
+- name: "Provisioning of base system"
+  hosts: "{{ target | default('all') }}"
+  gather_facts: true
+  tasks:
+    - name: "Import role lingfra.system.time"
+      ansible.builtin.import_role:
+        name: lingfra.system.time
+      tags:
+        - time
+
+    - name: "Import role lingfra.system.locale"
+      ansible.builtin.import_role:
+        name: lingfra.system.locale
+      tags:
+        - locale
+
+    - name: "Import role lingfra.system.vconsole"
+      ansible.builtin.import_role:
+        name: lingfra.system.vconsole
+      tags:
+        - vconsole
+
+    - name: "Import role lingfra.system.mkinitcpio"
+      ansible.builtin.import_role:
+        name: lingfra.system.mkinitcpio
+      tags:
+        - mkinitcpio
+
+    - name: "Import role lingfra.system.grub"
+      ansible.builtin.import_role:
+        name: lingfra.system.grub
+      tags:
+        - grub
+
+    - name: "Import role lingfra.system.openssh_server"
+      ansible.builtin.import_role:
+        name: lingfra.system.openssh_server
+      tags:
+        - openssh_server
+
+- name: Import playbook lingfra.system.systemd
+  ansible.builtin.import_playbook: lingfra.system.systemd
