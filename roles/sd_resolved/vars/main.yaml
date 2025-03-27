@@ -1,0 +1,4 @@
+---
+# vars file for lingfra.system.sd_resolved
+
+sd_resolved_config_dir: /etc/systemd/resolved.conf.d
