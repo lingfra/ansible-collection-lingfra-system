@@ -1,0 +1,7 @@
+{{ ansible_managed | ansible.builtin.comment }}
+
+[Time]
+NTP={{ sd_timesyncd_conf_ntp | join(' ') }}
+{% if (sd_timesyncd_conf_fallback_ntp is defined) %}
+FallbackNTP={{ sd_timesyncd_conf_fallback_ntp | join(' ') }}
+{% endif %}

@@ -1,0 +1,8 @@
+---
+# handlers file for lingfra.system.sd_timesyncd
+
+- name: "Restart systemd-timesyncd"
+  ansible.builtin.systemd:
+    name: systemd-timesyncd.service
+    state: restarted
+  become: true
