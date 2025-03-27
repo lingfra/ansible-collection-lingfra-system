@@ -1,0 +1,10 @@
+---
+# handlers file for lingfra.system.sd_resolved
+
+- name: "Restart systemd-resolved"
+  ansible.builtin.systemd:
+    name: systemd-resolved.service
+    state: restarted
+  become: true
+  when:
+    - sd_resolved_chroot_path is not defined

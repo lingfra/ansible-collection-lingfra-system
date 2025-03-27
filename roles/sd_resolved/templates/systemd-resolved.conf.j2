@@ -1,0 +1,6 @@
+{{ ansible_managed | ansible.builtin.comment }}
+
+[Resolve]
+{% if (sd_resolved_conf_llmr is defined) %}
+LLMR={{ sd_resolved_conf_llmr | ansible.builtin.ternary('yes', 'no', none_val='no') }}
+{% endif %}
