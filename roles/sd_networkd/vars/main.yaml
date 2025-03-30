@@ -1,0 +1,4 @@
+---
+# vars file for lingfra.system.sd_networkd
+
+sd_networkd_config_dir: /etc/systemd/networkd.conf.d

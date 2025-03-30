@@ -1,0 +1,6 @@
+{{ ansible_managed | ansible.builtin.comment }}
+
+[Network]
+{% if (sd_networkd_conf_ipv6_privacy_extensions is defined) %}
+IPv6PrivacyExtensions={{ sd_networkd_conf_ipv6_privacy_extensions | ansible.builtin.ternary('yes', 'no', none_val='no') }}
+{% endif %}

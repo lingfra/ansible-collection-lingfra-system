@@ -1,0 +1,32 @@
+---
+# tasks file for lingfra.system.sd_networkd
+
+- name: "Create directory {{ sd_networkd_config_dir }}"
+  ansible.builtin.file:
+    path: "{{ sd_networkd_config_dir | lingfra.system.chrooted_path(sd_networkd_chroot_path | default(none)) }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  become: true
+
+- name: "Template systemd networkd config file"
+  ansible.builtin.template:
+    src: systemd-networkd.conf.j2
+    dest: "{{ sd_networkd_conf_file_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+  notify:
+    - Restart systemd-networkd
+  vars:
+    sd_networkd_conf_file_path: "{{ (sd_networkd_config_dir | lingfra.system.chrooted_path(sd_networkd_chroot_path | default(none)), '50-ansible.conf') | path_join }}"
+
+- name: "Enable and start systemd-networkd"
+  ansible.builtin.systemd:
+    name: systemd-networkd.service
+    enabled: true
+  become: true
+  when:
+    - sd_networkd_chroot_path is not defined

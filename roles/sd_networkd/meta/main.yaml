@@ -1,0 +1,11 @@
+---
+# meta file for lingfra.system.sd_networkd
+
+dependencies: []
+
+galaxy_info:
+  author: lingling
+  description: Configures systemd-networkd.
+  license: The Unlicense
+  min_ansible_version: "2.15"
+  platforms: []
