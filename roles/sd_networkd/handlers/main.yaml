@@ -1,0 +1,10 @@
+---
+# handlers file for lingfra.system.sd_networkd
+
+- name: "Restart systemd-networkd"
+  ansible.builtin.systemd:
+    name: systemd-networkd.service
+    state: restarted
+  become: true
+  when:
+    - sd_networkd_chroot_path is not defined
