@@ -51,6 +51,7 @@ specific package manager (currently only pacman is supported).
 - [provision](./playbooks/provision.yaml): Performs basic provisioning tasks on the
 host.
 - [sd_network](./playbooks/sd_network.yaml)
+- [systemd](./playbooks/systemd.yaml)
 
 ## Installation
 
