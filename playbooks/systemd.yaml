@@ -1,0 +1,24 @@
+---
+- name: "Configure systemd"
+  hosts: "{{ target | default('all') }}"
+  gather_facts: true
+  tags:
+    - systemd
+  tasks:
+    - name: "Import role lingfra.system.sd_networkd"
+      ansible.builtin.import_role:
+        name: lingfra.system.sd_networkd
+      tags:
+        - sd_networkd
+
+    - name: "Import role lingfra.system.sd_resolved"
+      ansible.builtin.import_role:
+        name: lingfra.system.sd_resolved
+      tags:
+        - sd_resolved
+
+    - name: "Import role lingfra.system.sd_timesyncd"
+      ansible.builtin.import_role:
+        name: lingfra.system.sd_timesyncd
+      tags:
+        - sd_timesyncd
