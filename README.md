@@ -40,9 +40,33 @@ host.
 
 ## Installation
 
-The collection can be obtained from the Git repository. This may be desirable to
-get the latest development version. The following `requirements.yaml` entry, can
-be used to download directly from Git:
+This collection is published to [Ansible Galaxy](https://galaxy.ansible.com). It
+can be installed using the Ansible Galaxy CLI:
+
+```bash
+ansible-galaxy collection install lingfra.system
+```
+
+It is also possible to specify this collection in the `requirements.yaml` (or
+`requirements.yml`) file:
+
+```yaml
+---
+collections:
+  - name: lingfra.system
+    version: "v0.1.0"   # optionally specify version
+```
+
+And use the Ansible Galaxy CLI to install the definitions from the requirements
+file:
+
+```bash
+ansible-galaxy install -r requirements.yaml
+```
+
+Alternatively, the collection can be obtained from the Git repository. This may
+be desirable to get the latest development version. The following
+`requirements.yaml` entry, can be used to download directly from Git:
 
 ```yaml
 ---
