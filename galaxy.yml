@@ -15,9 +15,13 @@ tags:
   - linux
 dependencies: {}
 build_ignore:
-  - '*.tar.gz'
-  - .aar_doc
-  - .aar_doc.yml
-  - .git
-  - .gitignore
-  - .gitmodules
+  - "**/*.ansible"
+  - "**/.gitignore"
+  - "*.tar.gz"
+  - ".aar_doc"
+  - ".aar_doc.yml"
+  - ".ansible"
+  - ".git"
+  - ".gitignore"
+  - ".gitmodules"
+  - "molecule"
