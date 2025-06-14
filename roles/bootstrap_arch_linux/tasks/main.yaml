@@ -1,0 +1,148 @@
+---
+- name: Ensure all services are done initializing
+  ansible.builtin.command:
+    cmd: systemctl is-system-running --wait
+  changed_when: false
+
+- name: Import role lingfra.system.partitions
+  ansible.builtin.import_role:
+    name: partitions
+  vars:
+    partitions_chroot_path: "{{ bootstrap_arch_linux_chroot_path }}"
+    partitions_device: "{{ bootstrap_arch_linux_device }}"
+    partitions_system_type: "{{ bootstrap_arch_linux_system_type }}"
+
+- name: Import role lingfra.system.pacstrap
+  ansible.builtin.import_role:
+    name: pacstrap
+  tags:
+    - pacstrap
+  vars:
+    pacstrap_chroot_path: "{{ bootstrap_arch_linux_chroot_path }}"
+    pacstrap_packages: "{{
+        bootstrap_arch_linux_pacstrap_packages + ['efibootmgr']
+        if bootstrap_arch_linux_system_type == 'uefi' else
+        bootstrap_arch_linux_pacstrap_packages
+      }}"
+
+- name: Import role lingfra.system.genfstab
+  ansible.builtin.import_role:
+    name: lingfra.system.genfstab
+  tags:
+    - genfstab
+  vars:
+    genfstab_chroot_path: "{{ bootstrap_arch_linux_chroot_path }}"
+
+- name: "Import role lingfra.system.time"
+  ansible.builtin.import_role:
+    name: lingfra.system.time
+  tags:
+    - time
+  vars:
+    time_chroot_path: "{{ bootstrap_arch_linux_chroot_path }}"
+
+- name: "Import role lingfra.system.locale"
+  ansible.builtin.import_role:
+    name: lingfra.system.locale
+  tags:
+    - locale
+  vars:
+    locale_chroot_path: "{{ bootstrap_arch_linux_chroot_path }}"
+
+# ToDo: Flush handlers after locale role or in it.
+
+- name: "Import role lingfra.system.vconsole"
+  ansible.builtin.import_role:
+    name: lingfra.system.vconsole
+  tags:
+    - vconsole
+  vars:
+    vconsole_chroot_path: "{{ bootstrap_arch_linux_chroot_path }}"
+
+- name: "Import role lingfra.system.mkinitcpio"
+  ansible.builtin.import_role:
+    name: lingfra.system.mkinitcpio
+  tags:
+    - mkinitcpio
+  vars:
+    mkinitcpio_chroot_path: "{{ bootstrap_arch_linux_chroot_path }}"
+    mkinitcpio_conf_hooks:
+      - systemd
+      - autodetect
+      - block
+      - sd-vconsole
+      - lvm2
+      - filesystems
+      - fsck
+    mkinitcpio_force_build: true
+
+- name: "Import role lingfra.system.grub"
+  ansible.builtin.import_role:
+    name: lingfra.system.grub
+  tags:
+    - grub
+  vars:
+    grub_chroot_path: "{{ bootstrap_arch_linux_chroot_path }}"
+    grub_install_path: "{{ bootstrap_arch_linux_device if bootstrap_arch_linux_system_type == 'bios' else '/boot' }}"
+    grub_install_target: "{{ 'i386-pc' if bootstrap_arch_linux_system_type == 'bios' else 'x86_64-efi' }}"
+
+- name: "Import role lingfra.system.openssh_server"
+  ansible.builtin.import_role:
+    name: lingfra.system.openssh_server
+  tags:
+    - openssh_server
+  vars:
+    openssh_server_chroot_path: "{{ bootstrap_arch_linux_chroot_path }}"
+    openssh_server_conf_permit_root_login: true
+    openssh_server_host_key_reset: true
+    openssh_server_install: false
+
+- name: "Import sd_resolved role"
+  ansible.builtin.import_role:
+    name: lingfra.system.sd_resolved
+  tags:
+    - sd_resolved
+  vars:
+    sd_resolved_chroot_path: "{{ bootstrap_arch_linux_chroot_path }}"
+
+- name: "Set hostname for new image"
+  ansible.builtin.copy:
+    content: "{{ bootstrap_arch_linux_hostname }}"
+    dest: "{{ bootstrap_arch_linux_hostname_path }}"
+    owner: root
+    group: root
+    mode: "0600"
+  become: true
+
+- name: "Copy SSH key for root"
+  ansible.posix.authorized_key:
+    key: "{{ bootstrap_arch_linux_root_authorized_ssh_key }}"
+    user: root
+    path: "{{ bootstrap_arch_linux_root_authorized_keys_path }}"
+  become: true
+
+- name: "Setup network for target"
+  ansible.builtin.template:
+    src: default.network.j2
+    dest: "{{ bootstrap_arch_linux_systemd_network_conf_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+
+- name: "Enable services in chroot"
+  ansible.builtin.command:
+    argv: "{{ (systemd_enable_command_argv + [service]) | lingfra.system.arch_chroot_argv(bootstrap_arch_linux_chroot_path | default(none)) }}"
+  become: true
+  changed_when: true
+  loop:
+    - "sshd.service"
+    - "sshdgenkeys.service"
+    - "systemd-networkd.service"
+    - "systemd-resolved.service"
+  loop_control:
+    loop_var: service
+  vars:
+    systemd_enable_command_argv:
+      - systemctl
+      - enable

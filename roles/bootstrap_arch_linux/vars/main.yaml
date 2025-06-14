@@ -1,0 +1,20 @@
+---
+# vars file for lingfra.system.bootstrap_arch_linux
+
+bootstrap_arch_linux_hostname_path: "{{ '/etc/hostname' | lingfra.system.chrooted_path(bootstrap_arch_linux_chroot_path) }}"
+bootstrap_arch_linux_pacstrap_packages:
+  - e2fsprogs
+  - grub
+  - linux-firmware
+  - lvm2
+  - man-db
+  - man-pages
+  - neovim
+  - openssh
+  - python
+  - qemu-guest-agent
+  - reflector
+  - sudo
+  - tmux
+bootstrap_arch_linux_systemd_network_conf_path: "{{ '/etc/systemd/network/40-default.network' | lingfra.system.chrooted_path(bootstrap_arch_linux_chroot_path) }}"
+bootstrap_arch_linux_root_authorized_keys_path: "{{ '/root/.ssh/authorized_keys' | lingfra.system.chrooted_path(bootstrap_arch_linux_chroot_path) }}"

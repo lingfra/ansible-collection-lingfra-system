@@ -1,0 +1,11 @@
+---
+- name: "Bootstrap guest system in chroot"
+  hosts: "{{ target }}"
+  gather_facts: true
+  tags:
+    - bootstrap_arch_linux
+  tasks:
+    - name: "Import role lingfra.system.bootstrap_arch_linux"
+      ansible.builtin.import_role:
+        name: lingfra.system.bootstrap_arch_linux
+
