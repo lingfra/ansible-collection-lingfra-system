@@ -1,0 +1,9 @@
+[Match]
+Name={{ bootstrap_arch_linux_network_device }}
+
+[Network]
+DHCP={{ 'no' if bootstrap_arch_linux_static_ip is defined else 'yes' }}
+{% if bootstrap_arch_linux_static_ip is defined %}
+Address={{ bootstrap_arch_linux_static_ip.address }}
+Gateway={{ bootstrap_arch_linux_static_ip.gateway }}
+{% endif %}

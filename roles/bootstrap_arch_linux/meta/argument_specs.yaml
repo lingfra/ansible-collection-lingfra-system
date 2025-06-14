@@ -1,0 +1,83 @@
+---
+# argument specs file for lingfra.system.bootstrap_arch_linux
+
+argument_specs:
+  main:
+    short_description: "Main entry point for lingfra.system.bootstrap_arch_linux role"
+    description:
+      - "This is a meta role, which is used to install an Arch Linux system."
+      - "It imports other roles of this collection, but sets the necessary variables to install them in a chroot."
+    author:
+      - "lingling"
+    options:
+      bootstrap_arch_linux_chroot_path:
+        type: "str"
+        default: "/target"
+        description:
+          - "The path of the chroot."
+      bootstrap_arch_linux_device:
+        type: "str"
+        required: true
+        description:
+          - "The device, on which the system should be installed."
+      bootstrap_arch_linux_hostname:
+        type: "str"
+        required: false
+        description:
+          - "The hostname of the new host."
+      bootstrap_arch_linux_root_authorized_ssh_key:
+        type: "str"
+        required: true
+        description:
+          - "SSH key, which is added to the authorized_keys file of the root user."
+      bootstrap_arch_linux_network_device:
+        type: "str"
+        default: "en*"
+        description:
+          - "Name of the network device of the target host."
+          - "The default of `en*` should match most devices."
+          - "This variable can be used to either customize the matching if it does not work or hardcode a network device name."
+      bootstrap_arch_linux_pacstrap_packages:
+        type: "list"
+        elements: "str"
+        default:
+          - linux
+          - linux-firmware
+          - base
+          - btrfs-progs
+          - cryptsetup
+          - e2fsprogs
+          - efibootmgr
+          - grub
+          - lvm2
+          - man-db
+          - man-pages
+          - neovim
+          - openssh
+          - python
+          - qemu-guest-agent
+          - reflector
+          - sudo
+          - tmux
+        description:
+          - "List of packages to be installed in the new system."
+          - "The default contains the most common packages."
+          - "You may want to specify your own list containing only packages needed for your installation."
+      bootstrap_arch_linux_static_ip:
+        type: "dict"
+        required: false
+        description:
+          - "Static IP for the newly bootstrapped host."
+          - "When this option is undefined DHCP is activated."
+          - "If an IP is provided DHCP will be deactivated."
+        options:
+          address:
+            type: "str"
+            required: true
+            description:
+              - "The static IP itself, e. g. 192.168.1.55/24"
+          gateway:
+            type: "str"
+            required: true
+            description:
+              - "Gateway of the network, e. g. 192.168.1.1"
