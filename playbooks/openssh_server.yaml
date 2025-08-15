@@ -1,0 +1,10 @@
+---
+- name: "Configure OpenSHH server"
+  hosts: "{{ target | default('all') }}"
+  gather_facts: true
+  tags:
+    - openssh_server
+  tasks:
+    - name: "Import role lingfra.system.openssh_server"
+      ansible.builtin.import_role:
+        name: lingfra.system.openssh_server

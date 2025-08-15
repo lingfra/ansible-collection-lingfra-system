@@ -34,6 +34,7 @@ create VLANs and bridge devives.
 [provision](./playbooks/provision.yaml) playbook this performs basic provisioning tasks, but
 also performs some non-idempotent tasks that are sometimes required on fresh hosts.
 - [mkinitcpio](./playbooks/mkinitcpio.yaml)
+- [openssh_server](./playbooks/openssh_server.yaml)
 - [pacman_key_reinit](./playbooks/pacman_key_reinit.yaml): This playbook
 re-initializes the pacman trust database by deleting, re-initializing and
 populating it. This is a shortcut to a task file from the
