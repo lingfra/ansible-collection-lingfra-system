@@ -10,6 +10,10 @@ Name={{ vlan.device_vlan }}
 Bridge={{ vlan.device_bridge }}
 {% else %}
 DHCP={{ 'yes' if vlan.dhcp else 'no' }}
+{% if (vlan.address is defined) and (vlan.address is not none) %}
+Address={{ vlan.address }}
+Gateway={{ vlan.gateway }}
+{% endif %}
 {% endif %}
 
 # End of file

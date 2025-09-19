@@ -41,6 +41,8 @@ argument_specs:
             type: "list"
             elements: "dict"
             required: true
+            required_together:
+              - ["address", "gateway"]
             description:
               - "List of VLANs associated with the device."
             options:
@@ -49,6 +51,12 @@ argument_specs:
                 required: true
                 description:
                   - "Specifies the VLAN ID. This should be the same as configured in the router on the port."
+              address:
+                type: "str"
+                required: false
+                description:
+                  - "A static address for the interface."
+                  - "It is required to specify a gateway too, if an address is specified."
               create_bridge:
                 type: "bool"
                 required: false
@@ -63,6 +71,11 @@ argument_specs:
                   - "Whether DHCP should be activated on the resulting interface or not."
                   - "If unspecified the value of [`sd_network_dhcp_default`](#sd_network_dhcp_default) is used."
                   - "Depending if a bridge for this VLAN is created or not, DHCP is activated at different places. When a bridge is assigned to the VLAN, then DHCP is specified in `50-bridge.network`. If the VLAN has no corresponding bridge DHCP is activated in `40-vlan.network`."
+              gateway:
+                type: "str"
+                required: false
+                description:
+                  - "If an address is specified it is required to specify a gateway too."
 
       sd_network_create_bridge_default:
         type: "bool"

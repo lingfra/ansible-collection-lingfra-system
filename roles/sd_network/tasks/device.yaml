@@ -21,10 +21,12 @@
   ansible.builtin.set_fact:
     device_vlan_list_accumulated: "{{ device_vlan_list_accumulated
       + [{
+          'address': vlan.address | default(none),
           'create_bridge': vlan.create_bridge | default(sd_network_create_bridge_default),
           'device_bridge': device_bridge,
           'device_vlan': device_vlan,
           'dhcp': vlan.dhcp | default(sd_network_dhcp_default),
+          'gateway': vlan.gateway | default(none),
           'id': vlan.id,
           'files': {
             'bridge_netdev': (config_dir, '30-' ~ device_bridge ~ '.netdev') | path_join,
