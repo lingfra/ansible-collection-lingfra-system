@@ -17,6 +17,34 @@ argument_specs:
       - "Starting from this entry point, the tasks [`device.yaml`](./tasks/device.yaml) are included. This is done for every list item in [`sd_network_device_vlan_list`](#sd_network_device_vlan_list). The tasks in [`device.yaml`](./tasks/device.yaml) make the basic configuration for the corresponding network device and create an accumulated VLAN list, which is needed in the next step. The next step is to include the [`vlan.yaml`](./tasks/vlan.yaml) for every specified VLAN."
     author:
       - lingling
+    examples: |
+      ```yaml
+      - name: Import role lingfra.system.sd_network
+        ansible.builtin.import_role:
+          name: lingfra.system.sd_network
+        vars:
+          sd_network_device_vlan_list:
+            - device: enp3s0
+              vlan_list:
+                - id: 101
+                  dhcp: true
+                  create_bridge: false
+                - id: 102
+                  dhcp: false
+                - id: 103
+                - id: 104
+
+            # Config for the same device, but in another directory.
+            # E. g. for mkinitcpio-systemd-tool config.
+            - device: enp3s0
+              config_dir: /etc/mkinitcpio-systemd-tool/network
+              vlan_list:
+                - id: 101
+                  create_bridge: false
+                  dhcp: false
+                  address: 192.168.101.10/24
+                  gateway: 192.168.101.1
+      ```
     options:
       sd_network_device_vlan_list:
         type: "list"

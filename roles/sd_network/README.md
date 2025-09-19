@@ -7,9 +7,7 @@ Configure systemd-network to create VLANs and bridge devives.
 
 Not specified.
 
-## Role Arguments
-
-### Entrypoint `main` - Main entry point for sd_network role
+## Entrypoint `main` - Main entry point for sd_network role
 
 This role is used to interpret tagged VLANs on (multiple) network devices (interfaces). To accomplish this, multiple concepts of [systemd-network](https://www.freedesktop.org/software/systemd/man/latest/systemd.network.html) are stacked.
 This results in five levels of configuration:
@@ -21,6 +19,8 @@ This results in five levels of configuration:
 5. Configure the bridge. Currently, the only option is to enable or disable DHCP.
 
 Starting from this entry point, the tasks [`device.yaml`](./tasks/device.yaml) are included. This is done for every list item in [`sd_network_device_vlan_list`](#sd_network_device_vlan_list). The tasks in [`device.yaml`](./tasks/device.yaml) make the basic configuration for the corresponding network device and create an accumulated VLAN list, which is needed in the next step. The next step is to include the [`vlan.yaml`](./tasks/vlan.yaml) for every specified VLAN.
+
+### Options for `main`
 
 #### `sd_network_device_vlan_list`
 
@@ -48,6 +48,10 @@ This list of dictionaries is the main configuration interface for this role. Eve
 
     Specifies the VLAN ID. This should be the same as configured in the router on the port.
 
+  - `address` (Type: `str`, optional).
+
+    A static address for the interface. It is required to specify a gateway too, if an address is specified.
+
   - `create_bridge` (Type: `bool`, optional).
 
     Whether a bridge device for this VLAN should be created or not. If unspecified the value of `sd_network_create_bridge_default` is used. When this is set to `false`, the bridge configuration files (`30-bridge.netdev` and `50-bridge.network`) are not created . However, the filenames are still composed and used to delete possible leftover configuration from previous executions.
@@ -55,6 +59,10 @@ This list of dictionaries is the main configuration interface for this role. Eve
   - `dhcp` (Type: `bool`, optional).
 
     Whether DHCP should be activated on the resulting interface or not. If unspecified the value of [`sd_network_dhcp_default`](#sd_network_dhcp_default) is used. Depending if a bridge for this VLAN is created or not, DHCP is activated at different places. When a bridge is assigned to the VLAN, then DHCP is specified in `50-bridge.network`. If the VLAN has no corresponding bridge DHCP is activated in `40-vlan.network`.
+
+  - `gateway` (Type: `str`, optional).
+
+    If an address is specified it is required to specify a gateway too.
 
 #### `sd_network_create_bridge_default`
 
@@ -68,31 +76,39 @@ Type: `bool`, Default: `False`.
 
 This variable defines a fallback for the field `sd_network_device_vlan_list.vlan_list.dhcp`, refer to the documentation of that option for more information. By default this is `false` to avoid accidently adding the host to multiple networks.
 
+### Examples for `main`
+
+```yaml
+- name: Import role lingfra.system.sd_network
+  ansible.builtin.import_role:
+    name: lingfra.system.sd_network
+  vars:
+    sd_network_device_vlan_list:
+      - device: enp3s0
+        vlan_list:
+          - id: 101
+            dhcp: true
+            create_bridge: false
+          - id: 102
+            dhcp: false
+          - id: 103
+          - id: 104
+
+      # Config for the same device, but in another directory.
+      # E. g. for mkinitcpio-systemd-tool config.
+      - device: enp3s0
+        config_dir: /etc/mkinitcpio-systemd-tool/network
+        vlan_list:
+          - id: 101
+            create_bridge: false
+            dhcp: false
+            address: 192.168.101.10/24
+            gateway: 192.168.101.1
+```
+
 ## Dependencies
 
 None.
-
-## Example Playbook
-
-```yaml
-- name: Configure VLANs and bridges
-  hosts: all
-  tasks:
-    - name: Import role lingfra.system.sd_network
-      ansible.builtin.import_role:
-        name: lingfra.system.sd_network
-      vars:
-        sd_network_device_vlan_list:
-          - device: enp3s0
-            vlan_list:
-              - id: 101
-                dhcp: true
-                create_bridge: false
-              - id: 102
-                dhcp: false
-              - id: 103
-              - id: 104
-```
 
 ## Project Information
 
