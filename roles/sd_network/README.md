@@ -60,6 +60,10 @@ This list of dictionaries is the main configuration interface for this role. Eve
 
     Whether DHCP should be activated on the resulting interface or not. If unspecified the value of [`sd_network_dhcp_default`](#sd_network_dhcp_default) is used. Depending if a bridge for this VLAN is created or not, DHCP is activated at different places. When a bridge is assigned to the VLAN, then DHCP is specified in `50-bridge.network`. If the VLAN has no corresponding bridge DHCP is activated in `40-vlan.network`.
 
+  - `dns` (Type: `str`, optional).
+
+    DNS server, useful for static configuration or to overwrite the server provided by DHCP.
+
   - `gateway` (Type: `str`, optional).
 
     If an address is specified it is required to specify a gateway too.

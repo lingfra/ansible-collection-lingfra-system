@@ -15,5 +15,8 @@ Address={{ vlan.address }}
 Gateway={{ vlan.gateway }}
 {% endif %}
 {% endif %}
+{% if (vlan.dns is defined) and (vlan.dns is not none) %}
+DNS={{ vlan.dns }}
+{% endif %}
 
 # End of file

@@ -99,6 +99,11 @@ argument_specs:
                   - "Whether DHCP should be activated on the resulting interface or not."
                   - "If unspecified the value of [`sd_network_dhcp_default`](#sd_network_dhcp_default) is used."
                   - "Depending if a bridge for this VLAN is created or not, DHCP is activated at different places. When a bridge is assigned to the VLAN, then DHCP is specified in `50-bridge.network`. If the VLAN has no corresponding bridge DHCP is activated in `40-vlan.network`."
+              dns:
+                type: "str"
+                required: false
+                description:
+                  - "DNS server, useful for static configuration or to overwrite the server provided by DHCP."
               gateway:
                 type: "str"
                 required: false

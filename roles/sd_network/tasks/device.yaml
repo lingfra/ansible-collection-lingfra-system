@@ -26,6 +26,7 @@
           'device_bridge': device_bridge,
           'device_vlan': device_vlan,
           'dhcp': vlan.dhcp | default(sd_network_dhcp_default),
+          'dns': vlan.dns | default(none),
           'gateway': vlan.gateway | default(none),
           'id': vlan.id,
           'files': {
