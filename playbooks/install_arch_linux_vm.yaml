@@ -1,0 +1,79 @@
+---
+- name: "Install Arch Linux system for virtual machine"
+  hosts: "{{ target }}"
+  gather_facts: true
+  tags:
+    - bootstrap_arch_linux
+  vars:
+    install_arch_linux_vm_chroot_path: /target
+  pre_tasks:
+    - name: Vertify needed variables exist
+      ansible.builtin.validate_argument_spec:
+        argument_spec: "{{ install_arch_linux_vm_args }}"
+      vars:
+        install_arch_linux_vm_args:
+          install_arch_linux_vm_chroot_path:
+            type: "str"
+            required: false
+          install_arch_linux_vm_device:
+            type: "str"
+            required: true
+          install_arch_linux_vm_root_authorized_ssh_key:
+            type: "str"
+            required: true
+          install_arch_linux_vm_system_type:
+            type: "str"
+            choices:
+              - "bios"
+              - "uefi"
+            required: true
+  tasks:
+    - name: Ensure all services are done initializing
+      ansible.builtin.command:
+        cmd: systemctl is-system-running --wait
+      changed_when: false
+
+    - name: Import role lingfra.system.partitions
+      ansible.builtin.import_role:
+        name: partitions
+      vars:
+        partitions_chroot_path: "{{ install_arch_linux_vm_chroot_path }}"
+        partitions_device: "{{ install_arch_linux_vm_device }}"
+        partitions_system_type: "{{ install_arch_linux_vm_system_type }}"
+        partitions_root_partition_type: lvm
+
+    - name: "Import role lingfra.system.bootstrap_arch_linux"
+      ansible.builtin.import_role:
+        name: lingfra.system.bootstrap_arch_linux
+      vars:
+        bootstrap_arch_linux_chroot_path: "{{ install_arch_linux_vm_chroot_path }}"
+        bootstrap_arch_linux_device: "{{ install_arch_linux_vm_device }}"
+        bootstrap_arch_linux_root_authorized_ssh_key: "{{ install_arch_linux_vm_root_authorized_ssh_key | default(omit) }}"
+        bootstrap_arch_linux_system_type: "{{ install_arch_linux_vm_system_type }}"
+
+    - name: "Import role lingfra.system.mkinitcpio"
+      ansible.builtin.import_role:
+        name: lingfra.system.mkinitcpio
+      tags:
+        - mkinitcpio
+      vars:
+        mkinitcpio_chroot_path: "{{ install_arch_linux_vm_chroot_path }}"
+        mkinitcpio_conf_hooks:
+          - systemd
+          - autodetect
+          - block
+          - sd-vconsole
+          - lvm2
+          - filesystems
+          - fsck
+        mkinitcpio_force_build: true
+
+    - name: "Import role lingfra.system.grub"
+      ansible.builtin.import_role:
+        name: lingfra.system.grub
+      tags:
+        - grub
+      vars:
+        grub_chroot_path: "{{ install_arch_linux_vm_chroot_path }}"
+        grub_install_path: "{{ install_arch_linux_vm_device if install_arch_linux_vm_system_type == 'bios' else '/boot' }}"
+        grub_install_target: "{{ 'i386-pc' if install_arch_linux_vm_system_type == 'bios' else 'x86_64-efi' }}"
