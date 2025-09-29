@@ -1,0 +1,62 @@
+---
+# tasks file for lingfra.system.partitions
+
+- name: Create LUKS container on root partition
+  community.crypto.luks_device:
+    device: "{{ partitions_devices['root'] }}"
+    state: opened
+    passphrase: "{{ partitions_root_partition_password }}"
+    name: root
+  become: true
+  when:
+    - partitions_root_partition_password is defined
+
+# ---------- LVM or btrfs configuration ----------
+
+- name: "Include tasks lvm.yaml"
+  ansible.builtin.include_tasks:
+    file: lvm.yaml
+    apply:
+      tags:
+        - configure
+        - lvm
+        - partitions
+  vars:
+    partitions_lvm_pvs: "{{ '/dev/mapper/root' if partitions_root_partition_password is defined else partitions_devices['root'] }}"
+  when:
+    - partitions_root_partition_type == 'lvm'
+
+- name: "Include tasks btrfs.yaml"
+  ansible.builtin.include_tasks:
+    file: btrfs.yaml
+    apply:
+      tags:
+        - configure
+        - btrfs
+        - partitions
+  vars:
+    partitions_btrfs_device: "{{ '/dev/mapper/root' if partitions_root_partition_password is defined else partitions_devices['root'] }}"
+  when:
+    - partitions_root_partition_type == 'btrfs'
+
+# ---------- EFI Partition ----------
+
+- name: "Format EFI boot partition (Only for UEFI systems)"
+  community.general.filesystem:
+    fstype: "vfat"
+    dev: "{{ partitions_devices['esp'] }}"
+    opts: -F 32
+  when: partitions_system_type == 'uefi'
+
+- name: "Mount ESP (Only for UEFI systems)"
+  ansible.posix.mount:
+    path: "{{ partitions_esp_mount_point | lingfra.system.chrooted_path(partitions_chroot_path | default(none)) }}"
+    src: "{{ partitions_devices['esp'] }}"
+    fstype: vfat
+    state: ephemeral
+    opts: fmask=0077,dmask=0077
+  become: true
+  tags:
+    - configure
+    - partitions
+  when: partitions_system_type == 'uefi'

@@ -21,11 +21,33 @@ These are specified in [`partitions_logical_volumes`](#partitions_logical_volume
 
 ### Options for `main`
 
+#### `partitions_activate_swap`
+
+Type: `bool`, Default: `False`.
+
+Whether swap should be activated during runtime.
+
+#### `partitions_btrfs_subvolumes`
+
+Type: `list of dicts of 'partitions_btrfs_subvolumes' options`, Default: `[{'name': '@', 'path': '/'}, {'name': '@home', 'path': '/home'}, {'name': '@opt', 'path': '/opt'}, {'name': '@root', 'path': '/root'}, {'name': '@srv', 'path': '/srv'}, {'name': '@swap', 'path': '/swap'}, {'name': '@var', 'path': '/var'}, {'name': '@var-tmp', 'path': '/var/tmp'}, {'name': '@usr-local', 'path': '/usr/local'}]`.
+
+Subvolumes for btrfs partitions
+
+**Options:**
+
+- **`name`** (Type: `str`, **required**).
+
+  Name of the subvolume.
+
+- **`path`** (Type: `str`, **required**).
+
+  Path (mount point) for the subvolume.
+
 #### `partitions_chroot_path`
 
-Type: `str`, optional.
+Type: `str`, Default: `/target`.
 
-If specified, all mounted paths will be subpaths of this.
+All mounted paths will be subpaths of this.
 
 #### `partitions_device`
 
@@ -66,11 +88,20 @@ List of logical volumes to be created on the device.
 
   Size of the logical volume, e. g. 10G, 250M or '100%FREE'. Refer to [**lvcreate(8)**](https://manpages.debian.org/jessie/lvm2/lvcreate.8.en.html) for more information on size notation. The suffixes are described for the `--size` option and the percent notation for `--extents`, repectivetaly.
 
-#### `partitions_activate_swap`
+#### `partitions_root_partition_password`
 
-Type: `bool`, Default: `False`.
+Type: `str`, optional.
 
-Whether swap should be activated during runtime.
+The password for the root partition. This implies that the partition will be encrypted by LUKS.
+
+#### `partitions_root_partition_type`
+
+Type: `str`, **required**.
+
+The type of the root partition.
+
+*Choices:* `btrfs`, `lvm`
+
 
 #### `partitions_system_type`
 

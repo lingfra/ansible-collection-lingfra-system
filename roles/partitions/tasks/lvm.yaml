@@ -1,0 +1,52 @@
+---
+# tasks file for lingfra.system.partitions
+
+# Configuration for LVM
+
+- name: "Create volume group {{ partitions_volume_group_name }}"
+  community.general.lvg:
+    pvs: "{{ partitions_lvm_pvs }}"
+    vg: "{{ partitions_volume_group_name }}"
+    vg_options: "--setautoactivation y"
+  become: true
+  tags:
+    - configure
+    - partitions
+
+- name: "Include tasks lvs.yaml"
+  ansible.builtin.include_tasks:
+    file: lvs.yaml
+    apply:
+      tags:
+        - configure
+        - lvm
+        - partitions
+  loop: "{{ partitions_logical_volumes | lingfra.system.parse_lvs(partitions_volume_group_name, chroot_path=partitions_chroot_path | default(None)) }}"
+  loop_control:
+    loop_var: volume
+    label: "{{ volume.name }}"
+
+- name: Configure swap as LVM volume
+  ansible.builtin.include_tasks:
+    file: swap.yaml
+    apply:
+      tags:
+        - configure
+        - lvm
+        - partitions
+        - swap
+  loop: "{{ swap_devices }}"
+  loop_control:
+    loop_var: swap_device
+  vars:
+    # This Jinja2 template parses the partitions_logical_volumes list of dict
+    # with the lingfra.system.parse_lvs filter. Afterwards it uses the internal
+    # Jinja2 filter `selectattr` to filter for entries with the swap filesystem
+    # type (fs_type). Finally, the list of dicts is converted to a normal list
+    # (of strings), which contains only the device paths.
+    swap_devices: "{{
+      partitions_logical_volumes
+        | lingfra.system.parse_lvs(partitions_volume_group_name, chroot_path=partitions_chroot_path | default(None))
+        | selectattr('fs_type', '==', 'swap')
+        | map(attribute='dev')
+      }}"

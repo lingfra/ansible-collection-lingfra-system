@@ -1,6 +1,12 @@
 ---
 # tasks file for partitions
 
+# ---------- Device Partioning ----------
+
+# The first partition on a device is either a 1 MiB BIOS boot partition for
+# systems with a legacy BIOS (often the case for VMs) or an EFI partition with
+# 512 MiB for modern UEFI systems (often the case for hardware machines).
+
 - name: "Create BIOS boot partition (Only for BIOS systems)"
   community.general.parted:
     device: "{{ partitions_device }}"
@@ -34,11 +40,12 @@
     - partitions
   when: partitions_system_type == 'uefi'
 
+# The second partition occupies the remaining space on the device.
+
 - name: "Create root partition"
   community.general.parted:
     device: "{{ partitions_device }}"
-    flags:
-      - lvm
+    flags: "{{ ['lvm'] if (partitions_root_partition_type == 'lvm' and partitions_root_partition_password is not defined) else omit }}"
     label: gpt
     name: root
     number: 2
@@ -51,6 +58,22 @@
     - parted
     - partitions
 
+- name: "Set partition type"
+  ansible.builtin.command:
+    argv:
+      - parted
+      - "{{ partitions_device }}"
+      - type
+      - 2
+      - 4f68bce3-e8cd-4db1-96e7-fbcaf984b709
+  become: true
+  changed_when: true
+  tags:
+    - configure
+    - parted
+    - partitions
+  when: partitions_system_type == 'uefi'
+
 - name: "Register partition layout"
   community.general.parted:
     device: "{{ partitions_device }}"
@@ -60,81 +83,18 @@
     - configure
     - partitions
 
-- name: "Create volume group {{ partitions_volume_group_name }}"
-  community.general.lvg:
-    pvs: "{{ partitions_devices['root'] }}"
-    vg: "{{ partitions_volume_group_name }}"
-    vg_options: "--setautoactivation y"
-  become: true
-  tags:
-    - configure
-    - partitions
-  vars:
-    partitions_devices: "{{ parted_result | lingfra.system.get_partition_block_device_names }}"
+# ---------- Filesystems ----------
 
-- name: "Format EFI boot partition (Only for UEFI systems)"
-  community.general.filesystem:
-    fstype: "vfat"
-    dev: "{{ partitions_devices['esp'] }}"
-    opts: -F 32
-  tags:
-    - configure
-    - parted
-    - partitions
-  vars:
-    partitions_devices: "{{ parted_result | lingfra.system.get_partition_block_device_names }}"
-  when: partitions_system_type == 'uefi'
-
-- name: "Include tasks lvs.yaml"
+- name: "Include tasks filesystems.yaml"
   ansible.builtin.include_tasks:
-    file: lvs.yaml
+    file: filesystems.yaml
     apply:
       tags:
         - configure
-        - lvm
+        - parted
         - partitions
-  loop: "{{ partitions_logical_volumes | lingfra.system.parse_lvs(partitions_volume_group_name, chroot_path=partitions_chroot_path | default(None)) }}"
-  loop_control:
-    loop_var: volume
-    label: "{{ volume.name }}"
-  tags:
-    - configure
-    - lvm
-    - partitions
-
-- name: "Mount ESP (Only for UEFI systems)"
-  ansible.posix.mount:
-    path: "{{ partitions_esp_mount_point | lingfra.system.chrooted_path(partitions_chroot_path | default(none)) }}"
-    src: "{{ partitions_devices['esp'] }}"
-    fstype: vfat
-    state: ephemeral
-  become: true
-  tags:
-    - configure
-    - partitions
   vars:
     partitions_devices: "{{ parted_result | lingfra.system.get_partition_block_device_names }}"
-  when: partitions_system_type == 'uefi'
-
-- name: "Include tasks swap.yaml"
-  ansible.builtin.include_tasks:
-    file: swap.yaml
-    apply:
-      tags:
-        - configure
-        - partitions
-        - swap
-  loop: "{{ partitions_logical_volumes
-    | lingfra.system.parse_lvs(partitions_volume_group_name,
-    chroot_path=partitions_chroot_path | default(None))
-    | selectattr('fs_type', '==', 'swap') }}"
-  loop_control:
-    loop_var: volume
-    label: "{{ volume.name }}"
-  tags:
-    - configure
-    - partitions
-    - swap
 
 - name: "Update mount facts"
   ansible.builtin.mount_facts:

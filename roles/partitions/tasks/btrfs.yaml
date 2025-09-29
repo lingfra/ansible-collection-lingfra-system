@@ -1,0 +1,52 @@
+---
+# tasks file for lingfra.system.partitions
+
+- name: "Format partition with btrfs"
+  community.general.filesystem:
+    fstype: btrfs
+    dev: "{{ partitions_btrfs_device }}"
+  become: true
+
+- name: "Mount btrfs partition"
+  ansible.posix.mount:
+    src: "{{ partitions_btrfs_device }}"
+    state: ephemeral
+    path: /btrfs_pool
+    fstype: btrfs
+  become: true
+  register: mount_btrfs_partition
+
+- name: "Update facts (to get new mounts)"
+  ansible.builtin.setup:
+
+- name: Create btrfs subvolumes
+  community.general.btrfs_subvolume:
+    name: "{{ subvolume.name }}"
+    filesystem_uuid: "{{ btrfs_filesystem_uuid }}"
+    default: "{{ subvolume.default | default(false) }}"
+  become: true
+  loop: "{{ partitions_btrfs_subvolumes }}"
+  loop_control:
+    loop_var: subvolume
+    label: "{{ subvolume.name }}"
+  vars:
+    btrfs_filesystem_uuid: "{{ (ansible_mounts | selectattr('device', 'match', partitions_btrfs_device))[0]['uuid'] }}"
+
+- name: Unmount btrfs partition
+  ansible.posix.mount:
+    path: /btrfs_pool
+    state: unmounted
+  become: true
+
+- name: Mount btrfs subvolumes
+  ansible.posix.mount:
+    fstype: btrfs
+    opts: subvol=/{{ subvolume.name }}
+    path: "{{ subvolume.path | lingfra.system.chrooted_path(partitions_chroot_path | default(null))}}"
+    src: "{{ partitions_btrfs_device }}"
+    state: ephemeral
+  become: true
+  loop: "{{ partitions_btrfs_subvolumes }}"
+  loop_control:
+    loop_var: subvolume
+    label: "{{ subvolume.name ~ ' -> ' ~ subvolume.path }}"
