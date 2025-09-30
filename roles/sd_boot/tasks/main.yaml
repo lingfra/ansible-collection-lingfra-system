@@ -1,0 +1,61 @@
+---
+# tasks file for lingfra.system.sd_boot
+
+- name: Install systemd-boot
+  ansible.builtin.command:
+    argv: "{{ sd_boot_install_command_argv
+      | lingfra.system.arch_chroot_argv(sd_boot_chroot_path | default(none)) }}"
+    creates: "{{ '/boot/EFI/systemd/systemd-bootx64.efi'
+      | lingfra.system.chrooted_path(sd_boot_chroot_path | default(none)) }}"
+  become: true
+
+- name: Copy loader.conf
+  ansible.builtin.copy:
+    content: |
+      default arch.conf
+      timeout 3
+    dest: "{{ sd_boot_loader_conf | lingfra.system.chrooted_path(sd_boot_chroot_path | default(none)) }}"
+    owner: root
+    group: root
+    mode: '0600'
+  become: true
+
+- name: Copy arch.conf
+  ansible.builtin.copy:
+    content: |
+      title   Arch Linux
+      linux   /vmlinuz-linux
+      initrd  /initramfs-linux.img
+    dest: "{{ (sd_boot_entries_dir, 'arch.conf') | path_join | lingfra.system.chrooted_path(sd_boot_chroot_path | default(none)) }}"
+    owner: root
+    group: root
+    mode: '0600'
+  become: true
+
+- name: Copy arch-fallback.conf
+  ansible.builtin.copy:
+    content: |
+      title   Arch Linux (fallback initramfs)
+      linux   /vmlinuz-linux
+      initrd  /initramfs-linux-fallback.img
+    dest: "{{ (sd_boot_entries_dir, 'arch-fallback.conf') | path_join | lingfra.system.chrooted_path(sd_boot_chroot_path | default(none)) }}"
+    owner: root
+    group: root
+    mode: '0600'
+  become: true
+
+- name: Enable systemd-boot-update.service
+  ansible.builtin.systemd_service:
+    name: systemd-boot-update.service
+    enabled: true
+  become: true
+  when:
+    - sd_boot_chroot_path is not defined
+
+- name: Enable systemd-boot-update.service (in chroot)
+  ansible.builtin.command:
+    cmd: arch-chroot {{ sd_boot_chroot_path }} systemctl enable systemd-boot-update.service
+  become: true
+  changed_when: true
+  when:
+    - sd_boot_chroot_path is defined

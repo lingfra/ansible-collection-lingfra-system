@@ -1,0 +1,9 @@
+---
+# vars file for lingfra.system.sd_boot
+
+sd_boot_install_command_argv:
+  - bootctl
+  - install
+  - "--variables=yes"
+sd_boot_loader_conf: /boot/loader/loader.conf
+sd_boot_entries_dir: /boot/loader/entries
