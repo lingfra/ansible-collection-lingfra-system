@@ -32,6 +32,22 @@ def get_partition_block_device_names(parted_result):
     return result
 
 
+def get_partition_uuids(ansible_devices):
+
+    result = {}
+
+    for device_key in ansible_devices.keys():
+        if len(ansible_devices[device_key]['links']['uuids']) > 0:
+            result[f"/dev/{device_key}"] = ansible_devices[device_key]['links']['uuids']
+
+        if ansible_devices[device_key]['partitions']:
+            for partition_key in ansible_devices[device_key]['partitions'].keys():
+                if len(ansible_devices[device_key]['partitions'][partition_key]['links']['uuids']) > 0:
+                    result[f"/dev/{partition_key}"] = ansible_devices[device_key]['partitions'][partition_key]['links']['uuids']
+
+    return result
+
+
 def parse_lvs(lv_list, vg_name, chroot_path: None | str = None):
     """
     This filter plugin is used to parse the logical volume data structure from
@@ -83,4 +99,5 @@ class FilterModule(object):
         return {
             "parse_lvs": parse_lvs,
             "get_partition_block_device_names": get_partition_block_device_names,
+            "get_partition_uuids": get_partition_uuids,
         }
