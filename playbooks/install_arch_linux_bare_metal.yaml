@@ -1,0 +1,155 @@
+---
+# playbook lingfra.system.install_arch_linux_bare_metal
+
+- name: "Install encrypted Arch Linux system on bare metal"
+  hosts: "{{ target }}"
+  gather_facts: true
+  tags:
+    - bootstrap_arch_linux
+  vars:
+    install_arch_linux_bare_metal_chroot_path: /target
+  vars_prompt:
+    - name: luks_encryption_password
+      prompt: Password for the LUKS device?
+      private: true
+  pre_tasks:
+    - name: Vertify needed variables exist
+      ansible.builtin.validate_argument_spec:
+        argument_spec: "{{ install_arch_linux_bare_metal_args }}"
+      vars:
+        install_arch_linux_bare_metal_args:
+          install_arch_linux_bare_metal_chroot_path:
+            type: "str"
+            required: false
+          install_arch_linux_bare_metal_device:
+            type: "str"
+            required: true
+          install_arch_linux_bare_metal_hostname:
+            type: "str"
+            required: false
+          install_arch_linux_bare_metal_root_authorized_ssh_key:
+            type: "str"
+            required: true
+          install_arch_linux_bare_metal_system_type:
+            type: "str"
+            choices:
+              - "bios"
+              - "uefi"
+            required: true
+  tasks:
+    - name: Ensure all services are done initializing
+      ansible.builtin.command:
+        cmd: systemctl is-system-running --wait
+      changed_when: false
+
+    - name: Import role lingfra.system.partitions
+      ansible.builtin.import_role:
+        name: partitions
+      tags:
+        - partitions
+      vars:
+        partitions_chroot_path: "{{ install_arch_linux_bare_metal_chroot_path }}"
+        partitions_device: "{{ install_arch_linux_bare_metal_device }}"
+        partitions_root_partition_type: btrfs
+        partitions_root_partition_password: "{{ luks_encryption_password }}"
+        partitions_system_type: "{{ install_arch_linux_bare_metal_system_type }}"
+
+    - name: "Nullify luks_encryption_password"
+      ansible.builtin.set_fact:
+        luks_encryption_password: null
+
+    - name: "Import role lingfra.system.bootstrap_arch_linux"
+      ansible.builtin.import_role:
+        name: lingfra.system.bootstrap_arch_linux
+      vars:
+        bootstrap_arch_linux_chroot_path: "{{ install_arch_linux_bare_metal_chroot_path }}"
+        bootstrap_arch_linux_device: "{{ install_arch_linux_bare_metal_device }}"
+        bootstrap_arch_linux_hostname: "{{ install_arch_linux_bare_metal_hostname | default(inventory_hostname) }}"
+        bootstrap_arch_linux_packages:
+          - linux
+          - linux-firmware
+          - amd-ucode
+          - intel-ucode
+          - base
+          - btrfs-progs
+          - cryptsetup
+          - e2fsprogs
+          - efibootmgr
+          - grub
+          - man-db
+          - man-pages
+          - neovim
+          - openssh
+          - python
+          - reflector
+          - sudo
+          - tmux
+        bootstrap_arch_linux_root_authorized_ssh_key: "{{ install_arch_linux_bare_metal_root_authorized_ssh_key }}"
+
+    - name: "Import role lingfra.system.mkinitcpio"
+      ansible.builtin.import_role:
+        name: lingfra.system.mkinitcpio
+      tags:
+        - mkinitcpio
+      vars:
+        mkinitcpio_chroot_path: "{{ install_arch_linux_bare_metal_chroot_path }}"
+        mkinitcpio_conf_binaries:
+          - btrfs
+        mkinitcpio_conf_hooks:
+          - systemd
+          - autodetect
+          - microcode
+          - block
+          - sd-vconsole
+          - sd-encrypt
+          - filesystems
+          - fsck
+        mkinitcpio_force_build: true
+        mkinitcpio_sd_tool_enable: false
+
+    # ---------- Bootloader configuration ----------
+    
+    - name: "Register partition layout"
+      community.general.parted:
+        device: "{{ install_arch_linux_bare_metal_device }}"
+      become: true
+      register: parted_result
+      tags:
+        - bootloader
+
+    - name: "Set fact install_arch_linux_bare_metal_root_device_uuid"
+      ansible.builtin.set_fact:
+        install_arch_linux_bare_metal_root_device_uuid: "{{ device_uuids[device_path] | first }}"
+      tags:
+        - bootloader
+      vars:
+        device_uuids: "{{ ansible_facts['devices'] | lingfra.system.get_partition_uuids }}"
+        device_path: "{{ (parted_result | lingfra.system.get_partition_block_device_names)['root'] }}"
+
+    - name: "Include role lingfra.system.grub"
+      ansible.builtin.include_role:
+        name: lingfra.system.grub
+        apply:
+          tags:
+            - bootloader
+            - grub
+      vars:
+        grub_chroot_path: "{{ install_arch_linux_bare_metal_chroot_path }}"
+        grub_conf_cmdline_linux:
+          - rd.luks.name={{ install_arch_linux_bare_metal_root_device_uuid }}=root
+        grub_install_path: "{{ install_arch_linux_bare_metal_device if install_arch_linux_bare_metal_system_type == 'bios' else '/boot' }}"
+        grub_install_target: "{{ 'i386-pc' if install_arch_linux_bare_metal_system_type == 'bios' else 'x86_64-efi' }}"
+      when:
+        - install_arch_linux_bare_metal_system_type == 'bios'
+
+    - name: "Include role lingfra.system.sd_boot"
+      ansible.builtin.include_role:
+        name: lingfra.system.sd_boot
+        apply:
+          tags:
+            - bootloader
+            - sd_boot
+      vars:
+        sd_boot_chroot_path: "{{ install_arch_linux_bare_metal_chroot_path }}"
+      when:
+        - install_arch_linux_bare_metal_system_type == 'uefi'
