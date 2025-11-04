@@ -109,6 +109,11 @@ argument_specs:
                 required: false
                 description:
                   - "If an address is specified it is required to specify a gateway too."
+              ipv6_accept_ra:
+                type: "bool"
+                required: false
+                description:
+                  - "Whether IPv6 Router Announcements (RA) should be accepted or not (need to be true to get an IPv6 address)."
 
       sd_network_create_bridge_default:
         type: "bool"

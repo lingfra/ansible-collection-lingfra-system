@@ -68,6 +68,10 @@ This list of dictionaries is the main configuration interface for this role. Eve
 
     If an address is specified it is required to specify a gateway too.
 
+  - `ipv6_accept_ra` (Type: `bool`, optional).
+
+    Whether IPv6 Router Announcements (RA) should be accepted or not (need to be true to get an IPv6 address).
+
 #### `sd_network_create_bridge_default`
 
 Type: `bool`, Default: `True`.

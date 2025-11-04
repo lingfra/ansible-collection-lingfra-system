@@ -29,6 +29,7 @@
           'dns': vlan.dns | default(none),
           'gateway': vlan.gateway | default(none),
           'id': vlan.id,
+          'ipv6_accept_ra': vlan.ipv6_accept_ra | default(false),
           'files': {
             'bridge_netdev': (config_dir, '30-' ~ device_bridge ~ '.netdev') | path_join,
             'bridge_network': (config_dir, '50-' ~ device_bridge ~ '.network') | path_join,

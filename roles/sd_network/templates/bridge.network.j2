@@ -7,5 +7,6 @@ Name={{ vlan.device_bridge }}
 
 [Network]
 DHCP={{ 'yes' if vlan.dhcp else 'no' }}
+IPv6AcceptRA={{ 'yes' if vlan.ipv6_accept_ra else 'no' }}
 
 # End of file
