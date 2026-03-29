@@ -5,13 +5,13 @@
   ansible.builtin.debug:
     msg: |
       - pkgs_present__host: {{ pkgs_present__host }}
-      - pkgs_present__global['{{ ansible_distribution ~ ansible_distribution_major_version }}']: {{ pkgs_present__global[ansible_distribution ~ ansible_distribution_major_version] | default([]) }}
-      - pkgs_present__global['{{ ansible_distribution }}']: {{ pkgs_present__global[ansible_distribution] | default([]) }}
+      - pkgs_present__global['{{ ansible_facts['distribution'] ~ ansible_facts['distribution_major_version'] }}']: {{ pkgs_present__global[ansible_facts['distribution'] ~ ansible_facts['distribution_major_version']] | default([]) }}
+      - pkgs_present__global['{{ ansible_facts['distribution'] }}']: {{ pkgs_present__global[ansible_facts['distribution']] | default([]) }}
       - pkgs_present__global['all']: {{ pkgs_present__global['all'] | default([]) }}
 
       - pkgs_absent__host: {{ pkgs_absent__host }}
-      - pkgs_absent__global['{{ ansible_distribution ~ ansible_distribution_major_version }}']: {{ pkgs_absent__global[ansible_distribution ~ ansible_distribution_major_version] | default([]) }}
-      - pkgs_absent__global['{{ ansible_distribution }}']: {{ pkgs_absent__global[ansible_distribution] | default([]) }}
+      - pkgs_absent__global['{{ ansible_facts['distribution'] ~ ansible_facts['distribution_major_version'] }}']: {{ pkgs_absent__global[ansible_facts['distribution'] ~ ansible_facts['distribution_major_version']] | default([]) }}
+      - pkgs_absent__global['{{ ansible_facts['distribution'] }}']: {{ pkgs_absent__global[ansible_facts['distribution']] | default([]) }}
       - pkgs_absent__global['all']: {{ pkgs_absent__global['all'] | default([]) }}
     verbosity: 2
 
@@ -39,7 +39,7 @@
 
 - name: "Include package manager specific tasks"
   ansible.builtin.include_tasks:
-    file: "manage_pkgs_{{ ansible_pkg_mgr }}.yaml"
+    file: "manage_pkgs_{{ ansible_facts['pkg_mgr'] }}.yaml"
     apply:
       tags:
         - configure
