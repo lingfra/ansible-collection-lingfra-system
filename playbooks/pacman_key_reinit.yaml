@@ -14,4 +14,4 @@
       tags:
         - pacman
       when:
-        - ansible_pkg_mgr == 'pacman'
+        - ansible_facts['pkg_mgr'] == 'pacman'
