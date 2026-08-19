@@ -10,7 +10,7 @@
     params:
       files:
         - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}.yaml"
-        - "{{ ansible_facts['distribution' }}.yaml"
+        - "{{ ansible_facts['distribution'] }}.yaml"
         - "defaults.yaml"
       paths:
         - "vars"
