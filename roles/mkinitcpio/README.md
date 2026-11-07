@@ -26,7 +26,7 @@ comments on individual modules.
 - Build the initramfs.
   - Restores previous configuration and rebuilds in case of failure.
 - Optionally import
-[lingfra.system.mkinitcpio_sd_tool](https://codeberg.org/lingfra/ansible-collection-lingfra-system/src/branch/main/roles/mkinitcpio_sd_tool/README.md)
+[lingfra.system.mkinitcpio_sd_tool](https://github.com/lingfra/ansible-collection-lingfra-system/tree/main/roles/mkinitcpio_sd_tool/README.md)
 to configure remote root device unlocking over SSH. See
 [`mkinitcpio_sd_tool_enable`](#mkinitcpio_sd_tool_enable).
 
@@ -122,7 +122,7 @@ Refer to [**mkinitcpio.conf(5)**](https://man.archlinux.org/man/mkinitcpio.conf.
 
 Type: `bool`, Default: `False`.
 
-Whether or not to install and configure [mkinitcpio-systemd-tool](https://github.com/random-archer/mkinitcpio-systemd-tool). If set to `true`, the role [lingfra.system.mkinitcpio_sd_tool](https://codeberg.org/lingfra/ansible-collection-lingfra-system/src/branch/main/roles/mkinitcpio_sd_tool/README.md) will be imported.
+Whether or not to install and configure [mkinitcpio-systemd-tool](https://github.com/random-archer/mkinitcpio-systemd-tool). If set to `true`, the role [lingfra.system.mkinitcpio_sd_tool](https://github.com/lingfra/ansible-collection-lingfra-system/tree/main/roles/mkinitcpio_sd_tool/README.md) will be imported.
 
 ### Entrypoint `internal` - General internal role variables
 
@@ -169,5 +169,5 @@ None.
 This role is part of the Ansible collection [lingfra.system][collection_url].
 For more information, see the collections [README](../../README.md) file.
 
-[collection_url]: https://codeberg.org/lingfra/ansible-collection-lingfra-system
+[collection_url]: https://github.com/lingfra/ansible-collection-lingfra-system
 <!-- END_ANSIBLE_DOCS -->

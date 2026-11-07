@@ -18,5 +18,5 @@ for system administration and provisioning.
 - Install and remove system packages.
 - Configure systemd-network to create VLANs and bridge devives.
 
-[Unreleased]: https://codeberg.org/lingfra/ansible-collection-lingfra-system/compare/v0.1.0..HEAD
-[0.1.0]: https://codeberg.org/lingfra/ansible-collection-lingfra-shell/releases/tag/v0.1.0
+[Unreleased]: https://github.com/lingfra/ansible-collection-lingfra-system/compare/v0.1.0..HEAD
+[0.1.0]: https://github.com/lingfra/ansible-collection-lingfra-system/releases/tag/v0.1.0

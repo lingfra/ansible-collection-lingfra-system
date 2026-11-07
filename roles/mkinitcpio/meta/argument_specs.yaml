@@ -91,7 +91,7 @@ argument_specs:
         default: false
         description:
           - "Whether or not to install and configure [mkinitcpio-systemd-tool](https://github.com/random-archer/mkinitcpio-systemd-tool)."
-          - "If set to `true`, the role [lingfra.system.mkinitcpio_sd_tool](https://codeberg.org/lingfra/ansible-collection-lingfra-system/src/branch/main/roles/mkinitcpio_sd_tool/README.md) will be imported."
+          - "If set to `true`, the role [lingfra.system.mkinitcpio_sd_tool](https://github.com/lingfra/ansible-collection-lingfra-system/tree/main/roles/mkinitcpio_sd_tool/README.md) will be imported."
 
 # ---------- Synthetic Entry Points for Custom Argument Validation ----------
 

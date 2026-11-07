@@ -14,9 +14,9 @@ Not specified.
 This role makes the necessary preparations for using [mkinitcpio-systemd-tool](https://github.com/random-archer/mkinitcpio-systemd-tool).
 The main scope is to configure networking for root device decryption over SSH in early initramfs.
 Note that this role is intended to be imported by lingfra.system.mkinitcpio.
-Therefore, this role does not rebuild the initramfs, which is done by [lingfra.system.mkinitcpio](https://codeberg.org/lingfra/ansible-collection-lingfra-system/src/branch/main/roles/mkinitcpio/README.md).
+Therefore, this role does not rebuild the initramfs, which is done by [lingfra.system.mkinitcpio](https://github.com/lingfra/ansible-collection-lingfra-system/tree/main/roles/mkinitcpio/README.md).
 However, this role does set the variable `mkinitcpio_sd_tool_changed`, which can be used for subsequent action after this role has finished.
-This variable is taken into account by [lingfra.system.mkinitcpio](https://codeberg.org/lingfra/ansible-collection-lingfra-system/src/branch/main/roles/mkinitcpio/README.md).
+This variable is taken into account by [lingfra.system.mkinitcpio](https://github.com/lingfra/ansible-collection-lingfra-system/tree/main/roles/mkinitcpio/README.md).
 
 Note following limitation:
 By default, the timeout for the password entry is 90 seconds.
@@ -133,12 +133,12 @@ None.
 
 ## Example Playbook
 
-See the [Example Playbook section of lingfra.system.mkinitcpio](https://codeberg.org/lingfra/ansible-collection-lingfra-system/src/branch/main/roles/mkinitcpio#example-playbook).
+See the [Example Playbook section of lingfra.system.mkinitcpio](https://github.com/lingfra/ansible-collection-lingfra-system/tree/main/roles/mkinitcpio#example-playbook).
 
 ## Project Information
 
 This role is part of the Ansible collection [lingfra.system][collection_url].
 For more information, see the collections [README](../../README.md) file.
 
-[collection_url]: https://codeberg.org/lingfra/ansible-collection-lingfra-system
+[collection_url]: https://github.com/lingfra/ansible-collection-lingfra-system
 <!-- END_ANSIBLE_DOCS -->
