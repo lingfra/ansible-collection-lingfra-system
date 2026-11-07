@@ -21,7 +21,7 @@ argument_specs:
       - "Please note that it is not allowed to define a package as both present and absent."
       - "If this is the case, the role fails."
     author:
-      - "lingling"
+      - "Stella Kemmerling"
     options:
       pkgs_present__global:
         type: "dict"

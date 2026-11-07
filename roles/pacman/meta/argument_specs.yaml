@@ -11,7 +11,7 @@ argument_specs:
       - "You can specify the available repositories in [`pacman_repos`](#pacman_repos)."
       - "For configuring the main mirror the variable [`pacman_server`](#pacman_server) is available and the `/etc/pacman.d/mirrorlist` can be configured by either [`pacman_mirrorlist`](#pacman_mirrorlist) or [`pacman_reflector`](#pacman_reflector). After configuring a mirrorlist you may want to set [`pacman_server`](#pacman_server) to `''`."
     author:
-      - "lingling"
+      - "Stella Kemmerling"
     options:
       pacman_contrib:
         type: "bool"

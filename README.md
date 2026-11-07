@@ -97,10 +97,3 @@ aar-doc roles/foo markdown
 ## License
 
 [The Unlicense](./LICENSE)
-
-## Author Information
-
-lingling ([Codeberg][Codeberg], [GitHub][GitHub])
-
-[Codeberg]: https://codeberg.org/lingling
-[GitHub]: https://github.com/lingling9000

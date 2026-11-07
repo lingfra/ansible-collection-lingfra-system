@@ -4,7 +4,7 @@
 dependencies: []
 
 galaxy_info:
-  author: lingling
+  author: Stella Kemmerling
   description: Installs and configures mkinitcpio-systemd-tool for remote root device decryption over SSH.
   license: The Unlicense
   min_ansible_version: "2.15"
