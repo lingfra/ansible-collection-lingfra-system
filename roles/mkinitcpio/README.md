@@ -43,9 +43,7 @@ This role has only been tested on Arch Linux machines.
 
 Not specified.
 
-## Role Arguments
-
-### Entrypoint `main` - Main entry point for mkinitcpio role
+## Entrypoint `main` - Main entry point for mkinitcpio role
 
 The main scope of this role's entrypoint is to template the `mkinitcpio` configuration and then build the initramfs.
 If it is not desired to build the initramfs, it is possible to disable it by setting [`mkinitcpio_build_initramfs`](#mkinitcpio_build_initramfs) to `false`.
@@ -57,6 +55,8 @@ Refer to [**mkinitcpio.conf(5)**](https://man.archlinux.org/man/mkinitcpio.conf.
 Another useful resource is the example `mkinitcpio.conf` in the [upstream repository](https://gitlab.archlinux.org/archlinux/mkinitcpio/mkinitcpio/-/blob/master/mkinitcpio.conf).
 
 See [`mkinitcpio_sd_tool_enable`](#mkinitcpio_sd_tool_enable) to install and configure mkinitcpio-systemd-tool for remote root device unlocking over SSH.
+
+### Options for `main`
 
 #### `mkinitcpio_build_initramfs`
 
@@ -78,7 +78,7 @@ Path of the mkinitcpio configuration file.
 
 #### `mkinitcpio_conf_binaries`
 
-Type: `list of 'str'`, Default: `[]`.
+Type: list of `str`, Default: `[]`.
 
 Refer to [**mkinitcpio.conf(5)**](https://man.archlinux.org/man/mkinitcpio.conf.5) variable `BINARIES`.
 
@@ -96,19 +96,19 @@ Refer to [**mkinitcpio.conf(5)**](https://man.archlinux.org/man/mkinitcpio.conf.
 
 #### `mkinitcpio_conf_files`
 
-Type: `list of 'str'`, Default: `[]`.
+Type: list of `str`, Default: `[]`.
 
 Refer to [**mkinitcpio.conf(5)**](https://man.archlinux.org/man/mkinitcpio.conf.5) variable `FILES`.
 
 #### `mkinitcpio_conf_hooks`
 
-Type: `list of 'str'`, Default: `['base', 'udev', 'autodetect', 'microcode', 'modconf', 'kms', 'keyboard', 'keymap', 'consolefont', 'block', 'filesystems', 'fsck']`.
+Type: list of `str`, Default: `['base', 'udev', 'autodetect', 'microcode', 'modconf', 'kms', 'keyboard', 'keymap', 'consolefont', 'block', 'filesystems', 'fsck']`.
 
 Refer to [**mkinitcpio.conf(5)**](https://man.archlinux.org/man/mkinitcpio.conf.5) variable `HOOKS`. In addition, see the [Common Hooks](https://wiki.archlinux.org/title/Mkinitcpio#Common_hooks) section of the [Mkinitcpio article in the Arch Wiki](https://wiki.archlinux.org/title/Mkinitcpio).
 
 #### `mkinitcpio_conf_modules`
 
-Type: `list of 'str'`, Default: `[]`.
+Type: list of `str`, Default: `[]`.
 
 Refer to [**mkinitcpio.conf(5)**](https://man.archlinux.org/man/mkinitcpio.conf.5) variable `MODULES`.
 
@@ -124,13 +124,15 @@ Type: `bool`, Default: `False`.
 
 Whether or not to install and configure [mkinitcpio-systemd-tool](https://github.com/random-archer/mkinitcpio-systemd-tool). If set to `true`, the role [lingfra.system.mkinitcpio_sd_tool](https://github.com/lingfra/ansible-collection-lingfra-system/tree/main/roles/mkinitcpio_sd_tool/README.md) will be imported.
 
-### Entrypoint `internal` - General internal role variables
+## Entrypoint `internal` - General internal role variables
 
 This is a synthetic entry point, which is used for custom argument validation and documentation. Your playbook will fail if you use this entry point.
 
+### Options for `internal`
+
 #### `mkinitcpio_built_command_argv`
 
-Type: `list of 'str'`, **required**.
+Type: list of `str`, **required**.
 
 The command to built the initramfs image.
 

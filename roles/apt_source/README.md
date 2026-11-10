@@ -7,23 +7,23 @@ Configure APT sources on Deb-based systems.
 
 Not specified.
 
-## Role Arguments
-
-### Entrypoint `main` - Main entry point for apt_source role
+## Entrypoint `main` - Main entry point for apt_source role
 
 This is a simple role, which deploys APT data sources based on the contents of `apt_source_repo_list`. Afterwards it updates the APT cache.
 
+### Options for `main`
+
 #### `apt_source_repo_list`
 
-Type: `list of dicts of 'apt_source_repo_list' options`, Default: `[]`.
+Type: list of dicts of `apt_source_repo_list` [options](#options-for-main--apt_source_repo_list), Default: `[]`.
 
 List of repositories (_data sources_) to add for APT. See [**sources.list(5)**](https://manpages.debian.org/stable/apt/sources.list.5.en.html) for an explanation of the options.
 
-**Options:**
+### Options for `main` > `apt_source_repo_list`
 
 - `architectures` (Type: `str`, optional).
 
-- `components` (Type: `list of 'str'`, optional).
+- `components` (Type: list of `str`, optional).
 
 - `enabled` (Type: `bool`, optional).
 
@@ -33,12 +33,9 @@ List of repositories (_data sources_) to add for APT. See [**sources.list(5)**](
 
 - `suites` (Type: `str`, optional).
 
-- `types` (Type: `list of 'str'`, optional).
+- `types` (Type: list of `str`, optional).
 
-  **Choices:**
-
-  - `deb`
-  - `deb-src`
+  _Choices:_ `deb`, `deb-src`
 
 - `uris` (Type: `str`, optional).
 

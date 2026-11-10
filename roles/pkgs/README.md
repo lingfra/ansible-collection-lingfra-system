@@ -7,9 +7,7 @@ Install and remove system packages.
 
 Not specified.
 
-## Role Arguments
-
-### Entrypoint `main` - Main entry point for pkgs role
+## Entrypoint `main` - Main entry point for pkgs role
 
 This role installs and removes packages on the system.
 
@@ -27,6 +25,8 @@ Start the role with verbosity level 2 (`-vv`) to get information on the used var
 Please note that it is not allowed to define a package as both present and absent.
 If this is the case, the role fails.
 
+### Options for `main`
+
 #### `pkgs_present__global`
 
 Type: `dict`, optional.
@@ -35,7 +35,7 @@ Global dictionary specifying packages per distribution, which should be installe
 
 #### `pkgs_present__host`
 
-Type: `list of 'str'`, Default: `[]`.
+Type: list of `str`, Default: `[]`.
 
 List of packages, which should be **present** (installed if missing) on the target host. It is recommended to set this variable only in `host_vars` for a single host.
 
@@ -47,7 +47,7 @@ Global dictionary specifying packages per distribution, which should be removed.
 
 #### `pkgs_absent__host`
 
-Type: `list of 'str'`, Default: `[]`.
+Type: list of `str`, Default: `[]`.
 
 List of packages, which should be **absent** (removed if installed) on the target host. It is recommended to set this variable only in `host_vars` for a single host.
 

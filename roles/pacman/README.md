@@ -40,7 +40,7 @@ Initialize the pacman keyring.
 
 #### `pacman_mirrorlist`
 
-Type: `list of 'str'`, Default: `[]`.
+Type: list of `str`, Default: `[]`.
 
 Custom list of mirrors for pacman. Mutually exclusive with [`pacman_reflector`](#pacman_reflector).
 
@@ -64,21 +64,11 @@ The country (or countries) reflector should the mirrors limit to.
 
 #### `pacman_repos`
 
-Type: `list of 'str'`, Default: `['core', 'extra']`.
+Type: list of `str`, Default: `['core', 'extra']`.
 
 List of official Arch Linux repositories to be enabled.
 
-**Choices:**
-
-- `core`
-- `core-testing`
-- `extra`
-- `extra-testing`
-- `gnome-unstable`
-- `kde-unstable`
-- `multilib`
-- `multilib-testing`
-- `testing`
+_Choices:_ `core`, `core-testing`, `extra`, `extra-testing`, `gnome-unstable`, `kde-unstable`, `multilib`, `multilib-testing`, `testing`
 
 #### `pacman_server`
 

@@ -7,9 +7,7 @@ Installs and configures mkinitcpio-systemd-tool for remote root device decryptio
 
 Not specified.
 
-## Role Arguments
-
-### Entrypoint `main` - Main entry point for mkinitcpio_sd_tool role
+## Entrypoint `main` - Main entry point for mkinitcpio_sd_tool role
 
 This role makes the necessary preparations for using [mkinitcpio-systemd-tool](https://github.com/random-archer/mkinitcpio-systemd-tool).
 The main scope is to configure networking for root device decryption over SSH in early initramfs.
@@ -28,6 +26,8 @@ This can be fixed by setting `rootflags=x-systemd.device-timeout=0` (0 disables 
 This role does not modify kernel parameters, so this must be done manually if desired.
 See also <https://wiki.archlinux.org/title/Dm-crypt/System_configuration#Timeout>.
 
+### Options for `main`
+
 #### `mkinitcpio_sd_tool_chroot_dir`
 
 Type: `str`, optional.
@@ -36,11 +36,23 @@ If configured, all actions (e.g. file templates, commands) will be executed in t
 
 #### `mkinitcpio_sd_tool_crypttab_entries`
 
-Type: `list of dicts of 'mkinitcpio_sd_tool_crypttab_entries' options`, **required**.
+Type: list of dicts of `mkinitcpio_sd_tool_crypttab_entries` [options](#options-for-main--mkinitcpio_sd_tool_crypttab_entries), **required**.
 
 A list of entries for the crypttab of systemd-tool, which is located at `/etc/mkinitcpio-systemd-tool/config/crypttab`. Refer to [**crypttab(5)**](https://man.archlinux.org/man/crypttab.5.en) for details on the options. It is **required** to specify your device(s) here.
 
-**Options:**
+#### `mkinitcpio_sd_tool_fstab_entries`
+
+Type: list of `str`, Default: `[{'device': '/dev/mapper/root', 'dir': '/sysroot'}]`.
+
+Entries for the fstab of systemd-tool for the early initramfs, which is located at `/etc/mkinitcpio-systemd-tool/config/fstab`. The arguments are just standard [**fstab(5)**](https://man.archlinux.org/man/fstab.5) options. If you only have one device to decrypt on boot, and you have named this `root` in your [`mkinitcpio_sd_tool_crypttab_entries`](#mkinitcpio_sd_tool_crypttab_entries), you can leave this variable at its default.
+
+#### `mkinitcpio_sd_tool_ssh_pub_key`
+
+Type: `str`, **required**.
+
+SSH public keys for early userspace unlocking access. The keys are copied to an `authorized_keys` file in a custom location. Any keys not specified in this variable will be removed from the custom `authorized_keys` file! Add multiple keys by separating them with newlines. Since [mkinitcpio-systemd-tool](https://github.com/random-archer/mkinitcpio-systemd-tool) uses tinysshd as its SSH server, the keys must be of the type ed25519. Refer to [**tinysshd(8)**](https://man.archlinux.org/man/extra/tinyssh/tinysshd.8.en) for more information and to [**ssh-keygen(1)**](https://man.archlinux.org/man/ssh-keygen.1.en) if you need to generate a new key.
+
+### Options for `main` > `mkinitcpio_sd_tool_crypttab_entries`
 
 - **`name`** (Type: `str`, **required**).
 
@@ -62,18 +74,9 @@ A list of entries for the crypttab of systemd-tool, which is located at `/etc/mk
 
   The state of the crypttab entry for mkinitcpio_sd_tool. If `absent`, the line with the matching `name` will be removed.
 
-  **Choices:**
+  _Choices:_ `present`, `absent`
 
-  - `present`
-  - `absent`
-
-#### `mkinitcpio_sd_tool_fstab_entries`
-
-Type: `list of 'str'`, Default: `[{'device': '/dev/mapper/root', 'dir': '/sysroot'}]`.
-
-Entries for the fstab of systemd-tool for the early initramfs, which is located at `/etc/mkinitcpio-systemd-tool/config/fstab`. The arguments are just standard [**fstab(5)**](https://man.archlinux.org/man/fstab.5) options. If you only have one device to decrypt on boot, and you have named this `root` in your [`mkinitcpio_sd_tool_crypttab_entries`](#mkinitcpio_sd_tool_crypttab_entries), you can leave this variable at its default.
-
-**Options:**
+### Options for `main` > `mkinitcpio_sd_tool_fstab_entries`
 
 - **`device`** (Type: `str`, **required**).
 
@@ -87,15 +90,11 @@ Entries for the fstab of systemd-tool for the early initramfs, which is located 
 
 - `fsck` (Type: `int`, Default: `0`).
 
-#### `mkinitcpio_sd_tool_ssh_pub_key`
-
-Type: `str`, **required**.
-
-SSH public keys for early userspace unlocking access. The keys are copied to an `authorized_keys` file in a custom location. Any keys not specified in this variable will be removed from the custom `authorized_keys` file! Add multiple keys by separating them with newlines. Since [mkinitcpio-systemd-tool](https://github.com/random-archer/mkinitcpio-systemd-tool) uses tinysshd as its SSH server, the keys must be of the type ed25519. Refer to [**tinysshd(8)**](https://man.archlinux.org/man/extra/tinyssh/tinysshd.8.en) for more information and to [**ssh-keygen(1)**](https://man.archlinux.org/man/ssh-keygen.1.en) if you need to generate a new key.
-
-### Entrypoint `internal` - General internal role variables
+## Entrypoint `internal` - General internal role variables
 
 This is a synthetic entry point, which is used for custom argument validation and documentation. Your playbook will fail if you use this entry point.
+
+### Options for `internal`
 
 #### `mkinitcpio_sd_tool_authorized_keys_path`
 
@@ -117,13 +116,13 @@ Path to the fstab file for mkinitcpio-systemd-tool.
 
 #### `mkinitcpio_sd_tool_packages`
 
-Type: `list of 'str'`, **required**.
+Type: list of `str`, **required**.
 
 Package dependencies needed for systemd-tool to work.
 
 #### `mkinitcpio_sd_tool_units`
 
-Type: `list of 'str'`, **required**.
+Type: list of `str`, **required**.
 
 List of units that will be enabled for mkinitcpio-systemd-tool.
 

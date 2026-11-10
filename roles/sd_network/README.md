@@ -24,53 +24,9 @@ Starting from this entry point, the tasks [`device.yaml`](./tasks/device.yaml) a
 
 #### `sd_network_device_vlan_list`
 
-Type: `list of dicts of 'sd_network_device_vlan_list' options`, Default: `[]`.
+Type: list of dicts of `sd_network_device_vlan_list` [options](#options-for-main--sd_network_device_vlan_list), Default: `[]`.
 
 This list of dictionaries is the main configuration interface for this role. Every list item consists of a device name and a list of VLANs, which should be interpreted from this device. When this list is empty (the default) no actions are done.
-
-**Options:**
-
-- `config_dir` (Type: `str`, Default: `/etc/systemd/network`).
-
-  Specifies the configuration parent directory for the network configuration files.
-
-- **`device`** (Type: `str`, **required**).
-
-  The device the VLANs should be bound to. Need to be present on the target host.
-
-- **`vlan_list`** (Type: `list of dicts of 'vlan_list' options`, **required**).
-
-  List of VLANs associated with the device.
-
-  **Options:**
-
-  - **`id`** (Type: `int`, **required**).
-
-    Specifies the VLAN ID. This should be the same as configured in the router on the port.
-
-  - `address` (Type: `str`, optional).
-
-    A static address for the interface. It is required to specify a gateway too, if an address is specified.
-
-  - `create_bridge` (Type: `bool`, optional).
-
-    Whether a bridge device for this VLAN should be created or not. If unspecified the value of `sd_network_create_bridge_default` is used. When this is set to `false`, the bridge configuration files (`30-bridge.netdev` and `50-bridge.network`) are not created . However, the filenames are still composed and used to delete possible leftover configuration from previous executions.
-
-  - `dhcp` (Type: `bool`, optional).
-
-    Whether DHCP should be activated on the resulting interface or not. If unspecified the value of [`sd_network_dhcp_default`](#sd_network_dhcp_default) is used. Depending if a bridge for this VLAN is created or not, DHCP is activated at different places. When a bridge is assigned to the VLAN, then DHCP is specified in `50-bridge.network`. If the VLAN has no corresponding bridge DHCP is activated in `40-vlan.network`.
-
-  - `dns` (Type: `str`, optional).
-
-    DNS server, useful for static configuration or to overwrite the server provided by DHCP.
-
-  - `gateway` (Type: `str`, optional).
-
-    If an address is specified it is required to specify a gateway too.
-
-  - `ipv6_accept_ra` (Type: `bool`, optional).
-
-    Whether IPv6 Router Announcements (RA) should be accepted or not (need to be true to get an IPv6 address).
 
 #### `sd_network_create_bridge_default`
 
@@ -83,6 +39,50 @@ This variable defines a fallback for the field `sd_network_device_vlan_list.vlan
 Type: `bool`, Default: `False`.
 
 This variable defines a fallback for the field `sd_network_device_vlan_list.vlan_list.dhcp`, refer to the documentation of that option for more information. By default this is `false` to avoid accidently adding the host to multiple networks.
+
+### Options for `main` > `sd_network_device_vlan_list`
+
+- `config_dir` (Type: `str`, Default: `/etc/systemd/network`).
+
+  Specifies the configuration parent directory for the network configuration files.
+
+- **`device`** (Type: `str`, **required**).
+
+  The device the VLANs should be bound to. Need to be present on the target host.
+
+- **`vlan_list`** (Type: list of dicts of `vlan_list` [options](#options-for-main--sd_network_device_vlan_list--vlan_list), **required**).
+
+  List of VLANs associated with the device.
+
+### Options for `main` > `sd_network_device_vlan_list` > `vlan_list`
+
+- **`id`** (Type: `int`, **required**).
+
+  Specifies the VLAN ID. This should be the same as configured in the router on the port.
+
+- `address` (Type: `str`, optional).
+
+  A static address for the interface. It is required to specify a gateway too, if an address is specified.
+
+- `create_bridge` (Type: `bool`, optional).
+
+  Whether a bridge device for this VLAN should be created or not. If unspecified the value of `sd_network_create_bridge_default` is used. When this is set to `false`, the bridge configuration files (`30-bridge.netdev` and `50-bridge.network`) are not created . However, the filenames are still composed and used to delete possible leftover configuration from previous executions.
+
+- `dhcp` (Type: `bool`, optional).
+
+  Whether DHCP should be activated on the resulting interface or not. If unspecified the value of [`sd_network_dhcp_default`](#sd_network_dhcp_default) is used. Depending if a bridge for this VLAN is created or not, DHCP is activated at different places. When a bridge is assigned to the VLAN, then DHCP is specified in `50-bridge.network`. If the VLAN has no corresponding bridge DHCP is activated in `40-vlan.network`.
+
+- `dns` (Type: `str`, optional).
+
+  DNS server, useful for static configuration or to overwrite the server provided by DHCP.
+
+- `gateway` (Type: `str`, optional).
+
+  If an address is specified it is required to specify a gateway too.
+
+- `ipv6_accept_ra` (Type: `bool`, optional).
+
+  Whether IPv6 Router Announcements (RA) should be accepted or not (need to be true to get an IPv6 address).
 
 ### Examples for `main`
 
